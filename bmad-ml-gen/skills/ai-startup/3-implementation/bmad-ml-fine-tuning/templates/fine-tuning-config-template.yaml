@@ -1,0 +1,130 @@
+# ============================================================================
+# Fine-Tuning Configuration
+# ============================================================================
+# Purpose: Define all parameters needed to reproduce a fine-tuning experiment,
+#   from base model selection through training, evaluation, and output.
+# Guidance: Fill every field before starting a training run. Fields with
+#   defaults are marked; override only with justification. This file should
+#   be version-controlled alongside training code for reproducibility.
+# ============================================================================
+
+# --- Base Model ---
+# Purpose: Identify the pre-trained model being fine-tuned.
+# Guidance: Specify the exact model name as it appears on HuggingFace Hub or
+#   the provider's registry. Include the provider, parameter count, and
+#   context length to ensure hardware and dataset compatibility.
+base_model:
+  name: ""                # e.g., "meta-llama/Llama-3-8B-Instruct"
+  provider: ""            # e.g., "Meta", "Mistral AI", "OpenAI"
+  size: ""                # e.g., "8B", "70B" -- parameter count
+  context_length: 0       # e.g., 8192 -- max tokens the model supports
+
+# --- Dataset ---
+# Purpose: Define the training and validation data.
+# Guidance: Specify the path to the dataset (local or HuggingFace), format,
+#   sample counts, and any preprocessing steps applied before training.
+#   Preprocessing steps should be deterministic and reproducible.
+dataset:
+  path: ""                # e.g., "./data/support-tickets-v2" or "org/dataset-name"
+  format: ""              # e.g., "jsonl", "parquet", "csv", "huggingface"
+  train_samples: 0        # Number of training examples
+  val_samples: 0          # Number of validation examples
+  preprocessing_steps:    # Ordered list of transformations applied to raw data
+    []
+    # - "Filter records with empty response field"
+    # - "Truncate input to 2048 tokens"
+    # - "Apply chat template formatting"
+    # - "Deduplicate on input hash"
+
+# --- Fine-Tuning Method ---
+# Purpose: Select and configure the fine-tuning approach.
+# Guidance: Choose the method type (lora, qlora, full) based on hardware
+#   constraints and quality requirements. LoRA and QLoRA are preferred for
+#   cost efficiency; full fine-tuning only when parameter-efficient methods
+#   are insufficient. Specify LoRA hyperparameters only if method is lora
+#   or qlora.
+method:
+  type: lora              # lora | qlora | full
+  lora_rank: 16           # LoRA rank (r). Higher = more capacity, more memory. Typical: 8-64
+  lora_alpha: 32          # LoRA alpha. Usually 2x lora_rank. Controls update magnitude
+  lora_dropout: 0.05      # Dropout on LoRA layers. Typical: 0.0-0.1
+  target_modules:         # Which model layers to apply LoRA to
+    []
+    # - "q_proj"
+    # - "k_proj"
+    # - "v_proj"
+    # - "o_proj"
+    # - "gate_proj"
+    # - "up_proj"
+    # - "down_proj"
+
+# --- Training Hyperparameters ---
+# Purpose: Configure the training loop.
+# Guidance: Start with conservative defaults and tune based on validation
+#   loss. learning_rate and batch_size are the most impactful parameters.
+#   Use gradient_accumulation_steps to simulate larger batch sizes when
+#   GPU memory is limited. Set max_steps to -1 to train for full epochs.
+training:
+  learning_rate: 0.0002   # Typical range for LoRA: 1e-4 to 5e-4
+  batch_size: 4           # Per-device batch size. Reduce if OOM
+  gradient_accumulation_steps: 4   # Effective batch = batch_size * accumulation * gpu_count
+  epochs: 3               # Number of full passes over training data
+  max_steps: -1           # Override epochs if positive. -1 = use epochs
+  warmup_ratio: 0.03      # Fraction of total steps for LR warmup. Typical: 0.03-0.1
+  weight_decay: 0.01      # L2 regularization. Typical: 0.0-0.1
+  fp16: false             # Use float16 mixed precision. Set true for older GPUs (V100)
+  bf16: true              # Use bfloat16 mixed precision. Preferred for A100/H100
+
+# --- Evaluation ---
+# Purpose: Define how model quality is assessed during and after training.
+# Guidance: Choose metrics appropriate for the task. eval_steps controls how
+#   frequently evaluation runs (in training steps). eval_dataset can reference
+#   a separate hold-out set or use the val split from the dataset section.
+evaluation:
+  metrics:                # List of metrics to compute during evaluation
+    - accuracy            # Token-level or exact-match accuracy
+    - loss                # Validation loss (always tracked)
+    # - bleu              # For translation / generation tasks
+    # - rouge             # For summarization tasks
+    # - f1                # For classification / extraction tasks
+  eval_steps: 50          # Evaluate every N training steps. Set based on dataset size
+  eval_dataset: ""        # Path to eval dataset. Leave empty to use dataset.val split
+
+# --- Checkpointing ---
+# Purpose: Configure how and when model checkpoints are saved.
+# Guidance: save_steps should be a multiple of eval_steps. save_total_limit
+#   prevents disk exhaustion on long runs. best_model_metric determines
+#   which checkpoint is kept as the "best" model.
+checkpointing:
+  save_steps: 100         # Save a checkpoint every N training steps
+  save_total_limit: 3     # Max checkpoints to keep on disk. Oldest deleted first
+  best_model_metric: loss # Metric used to determine the best checkpoint. e.g., "loss", "accuracy"
+
+# --- Hardware ---
+# Purpose: Document the compute environment for reproducibility and cost tracking.
+# Guidance: Specify the GPU type and count. distributed_strategy is required
+#   if gpu_count > 1. Common strategies: ddp (DataParallel), fsdp
+#   (Fully Sharded Data Parallel), deepspeed_zero2, deepspeed_zero3.
+hardware:
+  gpu_count: 1            # Number of GPUs
+  gpu_type: ""            # e.g., "A100-80GB", "H100", "RTX 4090", "V100"
+  distributed_strategy: "" # e.g., "ddp", "fsdp", "deepspeed_zero2". Leave empty for single GPU
+
+# --- Output ---
+# Purpose: Define where the fine-tuned model is saved and whether it is
+#   pushed to a model registry.
+# Guidance: model_path should be a local directory. Set push_to_hub to true
+#   and hub_model_id to push the model to HuggingFace Hub after training.
+output:
+  model_path: "{experiment_artifacts}/models"   # Local save directory
+  push_to_hub: false                            # Push final model to HuggingFace Hub
+  hub_model_id: ""                              # e.g., "org/model-name-ft-v1"
+
+# --- Reproducibility ---
+# Purpose: Ensure experiments are reproducible across runs and machines.
+# Guidance: Set a fixed seed. Set deterministic to true for bitwise
+#   reproducibility (may reduce performance). Document the software
+#   environment in a separate requirements.txt or environment.yaml.
+reproducibility:
+  seed: 42                # Random seed for all RNGs (torch, numpy, python)
+  deterministic: false    # Enable fully deterministic operations. May slow training

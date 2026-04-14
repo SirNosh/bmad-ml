@@ -1,0 +1,116 @@
+# =============================================================================
+# Experiment Status Tracker
+# =============================================================================
+# Purpose: Maintain a single source of truth for all experiments in the project.
+#   Nosh uses this file for autonomous routing (NX: "what should we do next?"),
+#   lab meeting agendas, and progress tracking across iteration cycles.
+#
+# Guidance: Every experiment gets one entry, tracked from design through
+#   completion. Keep this file updated as experiments progress -- stale
+#   tracking undermines autonomous decision-making.
+#   - Add a new entry when an experiment is designed and approved
+#   - Update status and best_result as the experiment progresses
+#   - Link to the experiment design and results report artifacts
+#   - Use blockers to surface issues during lab meetings
+#   - Set finished date when an experiment completes or is abandoned
+#   - Include hypothesis in testable form ("If X, then Y will Z")
+#
+# Lifecycle: planned → active → completed | abandoned
+#   "abandoned" means the experiment was deliberately stopped (scope change,
+#   resource reallocation), not that it failed. Failed experiments are
+#   "completed" with results showing the hypothesis was rejected.
+# =============================================================================
+
+project: "{project_name}"
+current_iteration_cycle: 1
+
+# -- Experiment Entries -------------------------------------------------------
+# Each experiment tracks a single hypothesis test from design through results.
+#
+# Fields:
+#   id:              Unique experiment identifier (e.g., exp-001)
+#   name:            Human-readable name for the experiment
+#   status:          Current state: planned | active | completed | abandoned
+#   hypothesis:      One-sentence testable hypothesis
+#   model:           Architecture or model variant being tested
+#   dataset:         Dataset name and version
+#   primary_metric:  Name of the primary evaluation metric
+#   best_result:     Best observed value of primary_metric (null if not yet run)
+#   baseline_result: Baseline value of primary_metric for comparison
+#   started:         Date experiment runs began (null if planned)
+#   updated:         Date of last status change
+#   finished:        Date experiment completed or was abandoned (null if ongoing)
+#   owner:           Agent or person responsible for this experiment
+#   artifact_paths:
+#     design:        Path to experiment design document
+#     config:        Path to training configuration
+#     results:       Path to results report
+#   notes:           Freeform context or observations
+#   blockers:        List of current blockers preventing progress (empty if none)
+# -----------------------------------------------------------------------------
+
+experiments:
+  - id: "exp-001"
+    name: "baseline"
+    status: "planned"             # planned | active | completed | abandoned
+    hypothesis: ""                # "If [intervention], then [metric] will [change]"
+    model: ""                     # Architecture name or checkpoint reference
+    dataset: ""                   # Dataset name and version
+    primary_metric: ""            # e.g., "f1_macro", "accuracy", "bleu"
+    best_result: null             # Best observed value (null until measured)
+    baseline_result: null         # Baseline value for comparison
+    started: null                 # YYYY-MM-DD
+    updated: null                 # YYYY-MM-DD
+    finished: null                # YYYY-MM-DD
+    owner: ""                     # Responsible agent or person
+    artifact_paths:
+      design: ""                  # e.g., "{planning_artifacts}/experiment-design.md"
+      config: ""                  # e.g., "{planning_artifacts}/training-config.yaml"
+      results: ""                 # e.g., "{planning_artifacts}/results-report.md"
+    notes: ""
+    blockers: []                  # e.g., ["waiting for dataset v2", "GPU quota exceeded"]
+
+  # - id: "exp-002"
+  #   name: ""
+  #   status: "planned"
+  #   hypothesis: ""
+  #   model: ""
+  #   dataset: ""
+  #   primary_metric: ""
+  #   best_result: null
+  #   baseline_result: null
+  #   started: null
+  #   updated: null
+  #   finished: null
+  #   owner: ""
+  #   artifact_paths:
+  #     design: ""
+  #     config: ""
+  #     results: ""
+  #   notes: ""
+  #   blockers: []
+
+# =============================================================================
+# Worked Example (delete this section when starting your project)
+# =============================================================================
+# The following shows a completed experiment entry for reference:
+#
+#   - id: "exp-003"
+#     name: "lora-rank-sweep"
+#     status: "completed"
+#     hypothesis: "If we use LoRA with rank 16, then f1_macro will exceed the full fine-tuning baseline by at least 1% while reducing training time by 60%."
+#     model: "roberta-large + LoRA (rank 16)"
+#     dataset: "domain-corpus-v2"
+#     primary_metric: "f1_macro"
+#     best_result: 0.891
+#     baseline_result: 0.874
+#     started: "2026-03-10"
+#     updated: "2026-03-14"
+#     finished: "2026-03-14"
+#     owner: "Jett"
+#     artifact_paths:
+#       design: "{planning_artifacts}/experiment-design.md"
+#       config: "{experiment_artifacts}/exp-003/training-config.yaml"
+#       results: "{planning_artifacts}/results-report-exp-003.md"
+#     notes: "LoRA-16 matched full FT quality at 1/3 compute. Rank 32 gave +0.2% for 2x memory -- not worth it."
+#     blockers: []
