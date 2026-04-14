@@ -1,0 +1,5 @@
+---
+description: Invoke bmad-ml cypher (pi-backed). Use only when Nosh routes a matching task.
+---
+
+Build the curated payload, run `node .bmad-ml/dispatch-pi.mjs cypher <prompt-file>`, and summarize streamed SubagentEvents.

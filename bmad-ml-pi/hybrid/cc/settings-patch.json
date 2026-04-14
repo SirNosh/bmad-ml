@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node .bmad-ml/dispatch-pi.mjs:*)",
+      "Bash(mkdir -p .bmad-ml/tmp:*)",
+      "Read(.bmad-ml/**)"
+    ]
+  }
+}

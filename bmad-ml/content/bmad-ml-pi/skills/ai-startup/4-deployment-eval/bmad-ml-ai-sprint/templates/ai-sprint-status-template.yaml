@@ -1,0 +1,111 @@
+# ============================================================================
+# AI Sprint Status
+# ============================================================================
+# Purpose: Break approved AI design into implementation-ready sprint work and track the progress of that delivery sprint, including
+#   goals, tasks, risks, and retrospective items.
+# Guidance: Fill in each field at sprint start. Update task statuses and
+#   blockers daily. Complete the retrospective section at sprint end.
+# ============================================================================
+
+# --- Project and Sprint Identification ---
+# project: The name of the AI product or project this sprint belongs to.
+# sprint_id: A unique identifier for this sprint (e.g., ai-sprint-001).
+# status: Current sprint state. One of: planned, active, completed, cancelled.
+# focus_area: The primary theme or objective area for this sprint.
+# owner: The person responsible for driving this sprint to completion.
+project: "{project_name}"
+sprint_id: ai-sprint-001
+status: planned  # planned | active | completed | cancelled
+focus_area: "{primary theme for this sprint -- e.g., RAG pipeline MVP}"
+owner: "{sprint_owner_name}"
+
+# --- Timeline ---
+# started: The date the sprint began (ISO format). Leave empty if status is planned.
+# target_end: The planned end date for the sprint (ISO format).
+started: ""       # YYYY-MM-DD -- fill when sprint moves to active
+target_end: ""    # YYYY-MM-DD -- set during sprint planning
+
+# --- Sprint Goals ---
+# Purpose: Define 2-5 measurable goals that constitute sprint success.
+# Guidance: Each goal should have a description and clear acceptance criteria.
+#   Goals should be achievable within the sprint duration and independently
+#   verifiable. Prefer goals with binary pass/fail acceptance criteria.
+goals:
+  - description: "{e.g., Deploy RAG pipeline to staging environment}"
+    acceptance_criteria: "{e.g., Pipeline returns relevant results for 90%+ of golden test queries}"
+  - description: "{e.g., Complete safety audit for prompt injection risks}"
+    acceptance_criteria: "{e.g., All critical and high findings remediated; report signed off}"
+
+# --- Tasks ---
+# Purpose: Break sprint goals into trackable work items.
+# Guidance: Each task should be completable in 1-3 days. Assign a workflow
+#   (which skill or process drives this task), an assignee, and track status
+#   and blockers. Update status daily.
+#   status: One of: todo, in_progress, in_review, done, blocked, cancelled.
+tasks:
+  - id: "{e.g., TASK-001}"
+    description: "{e.g., Implement chunking pipeline for product documentation}"
+    workflow: "{e.g., bmad-ml-rag-pipeline}"
+    assignee: "{person_or_agent}"
+    status: todo   # todo | in_progress | in_review | done | blocked | cancelled
+    blockers: []   # list of strings describing what is blocking this task
+  - id: "{e.g., TASK-002}"
+    description: "{e.g., Run prompt injection test suite against staging}"
+    workflow: "{e.g., bmad-ml-ai-safety-audit}"
+    assignee: "{person_or_agent}"
+    status: todo
+    blockers: []
+
+# --- Risks ---
+# Purpose: Track risks that may prevent the sprint from achieving its goals.
+# Guidance: Identify risks at sprint start and update as new risks emerge.
+#   Rate probability and impact as high, medium, or low. Include a concrete
+#   mitigation plan for each risk.
+risks:
+  - description: "{e.g., Vector DB provisioning may be delayed by infra team}"
+    probability: medium   # high | medium | low
+    impact: high          # high | medium | low
+    mitigation: "{e.g., Use local Qdrant instance as interim; escalate infra request}"
+
+# --- Completed Items ---
+# Purpose: Record items completed during this sprint for velocity tracking.
+# Guidance: Move items here as they are finished. Include the task ID and a
+#   brief summary of what was delivered.
+completed_items: []
+  # - id: "TASK-001"
+  #   summary: "Chunking pipeline deployed and passing golden test set"
+  #   completed_date: "YYYY-MM-DD"
+
+# --- Blockers ---
+# Purpose: Escalation-ready list of items blocking sprint progress.
+# Guidance: Only list blockers that cannot be resolved by the assignee alone.
+#   Include who owns the resolution and the escalation path if it is not
+#   resolved within the expected timeframe.
+blockers: []
+  # - description: "{what is blocked and why}"
+  #   owner: "{who can unblock this}"
+  #   escalation: "{next step if not resolved in N days}"
+  #   since: "YYYY-MM-DD"
+
+# --- Retrospective ---
+# Purpose: Capture learnings at sprint end to improve future sprints.
+# Guidance: Fill this section during the sprint retrospective meeting.
+#   Be specific -- "communication was bad" is not actionable;
+#   "RAG team was not notified of schema change until day 3" is.
+retrospective:
+  what_went_well: []
+    # - "{e.g., Chunking pipeline was delivered 2 days early due to clear RAG design doc}"
+  what_to_improve: []
+    # - "{e.g., Safety audit started too late -- should begin in parallel with implementation}"
+  action_items: []
+    # - description: "{e.g., Start safety audit in sprint week 1 instead of week 2}"
+    #   owner: "{person}"
+    #   due: "YYYY-MM-DD"
+
+# --- Next Actions ---
+# Purpose: Capture immediate next steps to maintain momentum after the sprint.
+# Guidance: List 2-5 concrete actions that should happen before the next
+#   sprint begins. Reference specific workflows or artifacts where possible.
+next_actions:
+  - "{e.g., Run bmad-ml-ai-evaluation to generate evaluation report for stakeholder review}"
+  - "{e.g., Begin bmad-ml-ai-deploy workflow if quality gates pass}"

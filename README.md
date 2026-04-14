@@ -1,10 +1,11 @@
 ﻿# localBMAD Monorepo
 
-This repository contains the open-source BMad ML ecosystem as a single monorepo with three primary directories:
+This repository contains the open-source BMad ML ecosystem as a single monorepo with four primary directories:
 
-- `bmad-ml`: npm package/CLI installer (`bmad-ml`) for Cursor, Claude Code, and OpenCode
+- `bmad-ml`: published npm package/CLI installer (`bmad-ml`) for Cursor, Claude Code, OpenCode, and pi/hybrid targets
 - `bmad-ml-gen`: general BMad ML skill content and docs
 - `bmad-ml-oc`: OpenCode-oriented skills and agent shims
+- `bmad-ml-pi`: pi-native and hybrid (Claude Code/Cursor + pi runtime) distribution assets
 
 ## Repository Structure
 
@@ -13,6 +14,7 @@ localBMAD/
   bmad-ml/
   bmad-ml-gen/
   bmad-ml-oc/
+  bmad-ml-pi/
 ```
 
 Each directory has its own README with detailed usage and maintenance instructions.
@@ -26,11 +28,15 @@ Each directory has its own README with detailed usage and maintenance instructio
   - `--cursor`
   - `--claude-code`
   - `--opencode`
+  - `--pi`
+  - `--cc-pi`
+  - `--cursor-pi`
 - Provides self-contained docs commands:
   - `--about`
   - `--agents`
   - `--workflows`
   - `--opencode-guide`
+  - `--pi-guide`
 
 ### `bmad-ml-gen`
 
@@ -44,37 +50,35 @@ Each directory has its own README with detailed usage and maintenance instructio
 - OpenCode skill packaging and agent shim definitions
 - Runtime behavior support for multi-agent OpenCode sessions
 
+### `bmad-ml-pi`
+
+- pi-native BMad ML distribution
+- pi extension runtime scaffolding for isolated specialist delegation
+- Hybrid runtime assets:
+  - Claude Code orchestrator + pi subagents (`--cc-pi`)
+  - Cursor rule orchestrator + pi subagents (`--cursor-pi`)
+
 ## Quick Start
 
-From the `bmad-ml` directory:
+Use the published npm package from your project root:
 
 ```bash
-cd bmad-ml
-npm install
 npx bmad-ml --help
-```
-
-Install into your current project (run from a project root):
-
-```bash
+# or
 npx bmad-ml --cursor
 # or
 npx bmad-ml --claude-code
 # or
 npx bmad-ml --opencode
-```
-
-## npm Publish Flow (`bmad-ml`)
-
-```bash
-cd bmad-ml
-npm pack --dry-run
-npm publish --dry-run
-npm publish --access public
+# or
+npx bmad-ml --pi
+# or
+npx bmad-ml --cc-pi
+# or
+npx bmad-ml --cursor-pi
 ```
 
 ## Open Source Notes
 
 - License: MIT
-- Keep all three directory READMEs up to date when behavior/content changes
-- Bump `bmad-ml/package.json` version before each npm release
+- Keep the package README and CLI docs aligned when behavior changes

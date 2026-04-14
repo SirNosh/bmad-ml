@@ -19,6 +19,7 @@ Core model:
 - **21 specialist personas** execute research, planning, architecture, implementation, evaluation, and safety work
 - **75 installable skills** are placed in your IDE skill directory
 - **OpenCode mode** also installs **21 agent shims** for parallel subagent execution
+- **pi mode** installs a pi-native extension/runtime layout plus optional hybrid orchestrator targets
 
 ## AI Startup BMAD Backbone
 
@@ -42,6 +43,15 @@ npx bmad-ml --claude-code
 
 # OpenCode (skills + agent shims)
 npx bmad-ml --opencode
+
+# pi-native
+npx bmad-ml --pi
+
+# Claude Code orchestrator + pi subagents
+npx bmad-ml --cc-pi
+
+# Cursor orchestrator + pi subagents
+npx bmad-ml --cursor-pi
 ```
 
 Install options:
@@ -73,6 +83,7 @@ npx bmad-ml --about
 npx bmad-ml --agents
 npx bmad-ml --workflows
 npx bmad-ml --opencode-guide
+npx bmad-ml --pi-guide
 ```
 
 These commands are read-only and do not modify files.
@@ -139,28 +150,10 @@ Run `--opencode-guide` for startup steps and session navigation hints.
 - `--cursor` -> `.cursor/skills/`
 - `--claude-code` -> `.claude/skills/`
 - `--opencode` -> `.opencode/skills/` and `.opencode/agents/`
+- `--pi` -> `.pi/skills/`, `.pi/prompts/`, `.pi/extensions/bmad-ml/`, `.pi/AGENTS.md`
+- `--cc-pi` -> `.pi/` runtime + `.claude/skills/`, `.claude/agents/`, `.bmad-ml/dispatch-pi.mjs`
+- `--cursor-pi` -> `.pi/` runtime + `.cursor/rules/`, `.bmad-ml/dispatch-pi.mjs`
 
-## Maintainers: Docs and Release
+## Package Notes
 
-This package keeps docs and CLI help self-contained.
-
-Primary docs data layer:
-
-- `lib/docs.js` (source for CLI doc rendering)
-
-When updating capabilities:
-
-1. Update `lib/docs.js` first.
-2. Keep this README aligned with the CLI docs surfaces.
-3. Sync content snapshots:
-   - `content/bmad-ml-gen/skills/` from `../bmad-ml-gen/skills/`
-   - `content/bmad-ml-oc/skills/` from `../bmad-ml-oc/skills/`
-   - `content/bmad-ml-oc/agents/opencode/` from `../bmad-ml-oc/agents/opencode/`
-4. Bump `version` in `package.json`.
-5. Validate and publish:
-
-```bash
-npm pack --dry-run
-npm publish --dry-run
-npm publish
-```
+This package keeps docs and CLI help self-contained. Use `npx bmad-ml --help` for the current command surface and the built-in docs commands for in-terminal guidance.

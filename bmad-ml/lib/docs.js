@@ -1,4 +1,4 @@
-const DOC_FLAGS = ["--about", "--agents", "--workflows", "--opencode-guide"];
+const DOC_FLAGS = ["--about", "--agents", "--workflows", "--opencode-guide", "--pi-guide"];
 
 const docsData = {
   about: {
@@ -160,6 +160,36 @@ const docsData = {
       "If agent shims are missing, skills still run in sequential single-session mode.",
     ],
   },
+  pi: {
+    title: "pi and Hybrid Install Guide",
+    lines: [
+      "What --pi installs:",
+      "- Skills into .pi/skills/",
+      "- Prompt templates into .pi/prompts/",
+      "- pi extension into .pi/extensions/bmad-ml/",
+      "- Bootstrap block into .pi/AGENTS.md",
+      "",
+      "What --cc-pi installs:",
+      "- pi skills + subagent extension runtime",
+      "- Dispatcher script at .bmad-ml/dispatch-pi.mjs",
+      "- Claude Nosh skill and specialist shims under .claude/",
+      "- Additive permissions patch in .claude/settings.json",
+      "",
+      "What --cursor-pi installs:",
+      "- pi skills + subagent extension runtime",
+      "- Dispatcher script at .bmad-ml/dispatch-pi.mjs",
+      "- Cursor rules under .cursor/rules/",
+      "- Sequential specialist dispatch fallback in Cursor mode",
+      "",
+      "Model resolution order:",
+      "- Invocation override",
+      "- .pi/settings.json bmad_ml.models.<agent>",
+      "- _bmad/config.user.yaml ml.pi_models.<agent>",
+      "- _bmad/config.yaml ml.pi_models.<agent>",
+      "- Skill manifest pi_model",
+      "- Environment fallback",
+    ],
+  },
 };
 
 function renderBlock(title, lines) {
@@ -195,8 +225,12 @@ function renderOpenCodeGuide() {
   return renderBlock(docsData.opencode.title, docsData.opencode.lines);
 }
 
+function renderPiGuide() {
+  return renderBlock(docsData.pi.title, docsData.pi.lines);
+}
+
 function renderLearnMoreHint() {
-  return "Learn more: bmad-ml --about | --agents | --workflows | --opencode-guide";
+  return "Learn more: bmad-ml --about | --agents | --workflows | --opencode-guide | --pi-guide";
 }
 
 module.exports = {
@@ -206,5 +240,6 @@ module.exports = {
   renderAgents,
   renderWorkflows,
   renderOpenCodeGuide,
+  renderPiGuide,
   renderLearnMoreHint,
 };

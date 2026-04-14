@@ -1,0 +1,5 @@
+---
+description: Invoke bmad-ml fade (pi-backed). Use only when Nosh routes a matching task.
+---
+
+Build the curated payload, run `node .bmad-ml/dispatch-pi.mjs fade <prompt-file>`, and summarize streamed SubagentEvents.
