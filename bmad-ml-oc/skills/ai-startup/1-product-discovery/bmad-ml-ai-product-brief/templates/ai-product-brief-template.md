@@ -7,6 +7,8 @@ last_updated: 2026-04-07
 
 # AI Product Brief
 
+_This is the AI Startup PRD-equivalent planning artifact in BMad ML._
+
 ## Problem Statement
 
 > **Purpose:** Define the core problem this product solves, who experiences it, and why AI is the right approach. This section anchors every downstream decision.

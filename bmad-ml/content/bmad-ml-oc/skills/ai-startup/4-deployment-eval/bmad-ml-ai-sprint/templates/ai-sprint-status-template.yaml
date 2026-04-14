@@ -1,7 +1,7 @@
 # ============================================================================
 # AI Sprint Status
 # ============================================================================
-# Purpose: Track the progress of an AI product delivery sprint, including
+# Purpose: Break approved AI design into implementation-ready sprint work and track the progress of that delivery sprint, including
 #   goals, tasks, risks, and retrospective items.
 # Guidance: Fill in each field at sprint start. Update task statuses and
 #   blockers daily. Complete the retrospective section at sprint end.

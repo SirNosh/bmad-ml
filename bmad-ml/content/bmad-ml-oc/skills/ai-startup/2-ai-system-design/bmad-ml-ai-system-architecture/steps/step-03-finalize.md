@@ -18,6 +18,6 @@
 5. Present the architecture document to the user for review. Summarize:
    - Key architectural decisions and their trade-offs.
    - Open risks and items needing resolution.
-   - Recommended next workflows (RAG Pipeline, Agent System, etc.).
+   - Recommended next workflows (RAG Pipeline, Agent System, AI Readiness Check, AI Sprint Planning).
 
 **STOP and WAIT for user approval. Do not suggest the next workflow or chain to another agent.**

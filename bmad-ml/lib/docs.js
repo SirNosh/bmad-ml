@@ -17,6 +17,12 @@ const docsData = {
       "",
       "Orchestrator:",
       "- Nosh (`bmad-ml-nosh`) routes work, coordinates agents, and recommends next steps.",
+      "",
+      "AI Startup BMAD backbone:",
+      "- AI Product Brief = PRD-equivalent planning artifact.",
+      "- AI System Architecture = buildable solution design.",
+      "- AI Sprint = implementation work breakdown before build execution.",
+      "- Default order: brief -> architecture -> sprint plan -> implementation -> evaluation/safety -> deployment/review.",
     ],
   },
   agents: {
@@ -92,12 +98,18 @@ const docsData = {
       {
         heading: "AI Startup - Product Discovery + System Design",
         items: [
-          ["bmad-ml-ai-product-brief", "Produces ai-product-brief.md"],
+          ["bmad-ml-ai-product-brief", "Produces ai-product-brief.md (PRD-equivalent)"],
           ["bmad-ml-ai-system-architecture", "Produces ai-architecture.md"],
           ["bmad-ml-rag-pipeline", "Produces rag-design.md"],
           ["bmad-ml-agent-system", "Produces agent-system-design.md"],
           ["bmad-ml-prompt-engineering", "Produces prompt-spec.md"],
           ["bmad-ml-guardrails-design", "Produces guardrails-spec.md"],
+        ],
+      },
+      {
+        heading: "AI Startup - Delivery Planning",
+        items: [
+          ["bmad-ml-ai-sprint", "Produces ai-sprint-status.yaml (implementation plan)"],
         ],
       },
       {

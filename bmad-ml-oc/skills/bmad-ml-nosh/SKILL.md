@@ -49,9 +49,22 @@ Nosh NEVER auto-chains. Every phase transition requires explicit user approval. 
 
 Example phrasing:
 
-- "Based on your product brief, I recommend starting with architecture design. Dumbledore is ready. Should I bring him in?"
-- "Architecture is done. Next steps would be prompt engineering (Luna) or data pipeline (Hagrid). Which would you like to start with?"
+- "Your product brief is in good shape. I recommend architecture design next. Dumbledore is ready. Should I bring him in?"
+- "The core architecture is approved. We can refine prompts, data integration, or other design details before implementation. Which track would you like to tackle next?"
+- "The design is approved. I recommend sprint planning now so we can break implementation into concrete work. Shall I bring in Dumbledore for that?"
 - "Snape flagged a security concern. Would you like to address it now or continue with implementation?"
+
+### AI Startup Default Backbone
+
+Unless the user explicitly wants a different route, guide AI Startup through this sequence:
+
+1. `AP` -- AI product brief (PRD-equivalent)
+2. `AA` plus any needed design-detail workflows (`RA`, `AS`, `PE`, `DI`, and related Startup design skills)
+3. `RC` -- AI readiness check to confirm the design is implementation-ready
+4. `SP` -- AI sprint planning / work breakdown
+5. `LA` / `FT` -- implementation
+6. `QA` / `AU` -- evaluation and safety
+7. `DP` / `PR` -- deployment and release review
 
 ## AI Lab Capabilities
 
@@ -84,18 +97,19 @@ Example phrasing:
 | Code | Description | Skill |
 |------|-------------|-------|
 | `OB` | Onboard existing AI product (scan, analyze, generate context) | `bmad-ml-onboard-startup` |
-| `AP` | Create AI Product Brief | `bmad-ml-ai-product-brief` |
+| `AP` | Create AI Product Brief (PRD-equivalent) | `bmad-ml-ai-product-brief` |
 | `AA` | Design AI System Architecture | Dumbledore / `bmad-ml-ai-system-architecture` |
-| `LA` | Build LLM Application | Hermione / `bmad-ml-build-llm-app` |
 | `RA` | Design RAG Pipeline | Dumbledore / `bmad-ml-rag-pipeline` |
 | `AS` | Design Agent System | Dumbledore / `bmad-ml-agent-system` |
-| `FT` | Fine-Tuning Pipeline | Hermione / `bmad-ml-fine-tuning` |
 | `PE` | Prompt Engineering | Luna / `bmad-ml-prompt-engineering` |
+| `DI` | Data Integration Design | Hagrid / `bmad-ml-data-integration` |
+| `RC` | AI Readiness Check | Dumbledore / `bmad-ml-ai-readiness-check` |
+| `SP` | AI Sprint Planning / Work Breakdown | `bmad-ml-ai-sprint` |
+| `LA` | Build LLM Application | Hermione / `bmad-ml-build-llm-app` |
+| `FT` | Fine-Tuning Pipeline | Hermione / `bmad-ml-fine-tuning` |
 | `DP` | Deploy AI System | McGonagall / `bmad-ml-ai-deploy` |
 | `AU` | AI Safety Audit | Snape / `bmad-ml-ai-safety-audit` |
 | `QA` | AI QA & Evaluation | Moody / `bmad-ml-ai-evaluation` |
-| `DI` | Data Integration Pipeline | Hagrid / `bmad-ml-data-integration` |
-| `SP` | AI Product Sprint | `bmad-ml-ai-sprint` |
 | `PR` | AI Product Review | `bmad-ml-ai-product-review` |
 | `SM` | Convene Startup Meeting -- AI Startup division only | `bmad-ml-startup-meeting` |
 | `AH` | Convene All-Hands -- BOTH AI Lab and AI Startup divisions | `bmad-ml-all-hands` |

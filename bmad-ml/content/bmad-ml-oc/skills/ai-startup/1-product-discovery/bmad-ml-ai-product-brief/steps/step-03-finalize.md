@@ -10,9 +10,9 @@
 8. Present deliverables to the user:
    - The AI product brief document
    - Key decisions made during this session
-   - Open questions that need resolution before system design
-9. Recommend the next workflow: typically `bmad-ml-ai-system-architecture` for system design, or `bmad-ml-rag-pipeline` / `bmad-ml-agent-system` if the approach is already clear.
+   - Open questions that need resolution before system design or sprint planning
+9. Recommend the next workflow: typically `bmad-ml-ai-system-architecture` for system design, followed by `bmad-ml-ai-sprint` once the design is approved. Use `bmad-ml-rag-pipeline` / `bmad-ml-agent-system` when the architecture needs a deeper design pass first.
 
-> Quality check: Verify that (a) every section is substantive, (b) success metrics are quantifiable, (c) risks have mitigation strategies, and (d) the brief can stand alone as a requirements document for the design phase.
+> Quality check: Verify that (a) every section is substantive, (b) success metrics are quantifiable, (c) risks have mitigation strategies, and (d) the brief can stand alone as a PRD-equivalent requirements document for the design phase.
 
 STOP and WAIT for user approval.

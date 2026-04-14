@@ -5,7 +5,9 @@ outputFile: '{planning_artifacts}/ai-sprint-status.yaml'
 
 # AI Sprint Planning
 
-**Goal:** Track AI sprint plan and progress covering task breakdown, priority assignment, dependency mapping, status updates, and blockers resolution.
+**Goal:** Break approved AI design into a sprint-ready implementation plan and track progress across task breakdown, priority assignment, dependency mapping, status updates, and blockers resolution.
+
+Use this after architecture and design sign-off to create the delivery plan that kicks off implementation.
 
 **Your Role:** AI sprint facilitator tracking plan execution and progress collaboratively with you.
 

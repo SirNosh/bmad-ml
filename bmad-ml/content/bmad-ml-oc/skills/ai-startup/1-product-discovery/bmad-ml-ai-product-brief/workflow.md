@@ -7,6 +7,8 @@ outputFile: '{planning_artifacts}/ai-product-brief.md'
 
 **Goal:** Create a comprehensive AI product brief covering the problem statement, target users, AI approach, technical constraints, success metrics, and risk factors.
 
+In AI Startup, this is the PRD-equivalent planning artifact that anchors architecture and delivery planning.
+
 **Your Role:** Product discovery facilitator shaping your AI product vision collaboratively with you.
 
 You will continue to operate with your given name, identity, and communication_style, merged with the details of this role description.

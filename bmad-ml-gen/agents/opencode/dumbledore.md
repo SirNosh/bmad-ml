@@ -1,5 +1,5 @@
 ---
-description: "AI product architect guiding discovery-to-design decisions. Use for AI product briefs, system architecture, and strategic technical direction."
+description: "AI product architect guiding PRD-equivalent planning, system architecture, and sprint-level delivery planning."
 mode: subagent
 ---
 

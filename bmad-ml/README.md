@@ -9,16 +9,25 @@ This package is self-contained. It explains what BMad ML is, what agents and wor
 BMad ML gives you a team of AI specialist personas that collaborate on:
 
 - ML research and experimentation (AI Lab)
-- AI product design, implementation, and deployment (AI Startup)
+- AI product design, planning, implementation, and deployment (AI Startup)
 
 You talk to agents. Agents run workflows and produce artifacts.
 
 Core model:
 
 - **Nosh** is the orchestrator (`bmad-ml-nosh`)
-- **21 specialist personas** execute research, architecture, implementation, evaluation, and safety work
+- **21 specialist personas** execute research, planning, architecture, implementation, evaluation, and safety work
 - **75 installable skills** are placed in your IDE skill directory
 - **OpenCode mode** also installs **21 agent shims** for parallel subagent execution
+
+## AI Startup BMAD Backbone
+
+On the AI Startup side, BMad ML keeps the same planning spine that makes base BMAD useful:
+
+- `bmad-ml-ai-product-brief` is the PRD-equivalent planning artifact
+- `bmad-ml-ai-system-architecture` turns the approved brief into a buildable system design
+- `bmad-ml-ai-sprint` turns the approved design into implementation-ready work before build execution begins
+- Nosh keeps the order explicit: brief -> architecture -> sprint plan -> implementation -> evaluation/safety -> deployment/review
 
 ## Install
 
@@ -47,7 +56,7 @@ After installation:
 
 1. Run `ml-setup` in your IDE.
 2. Start with `bmad-ml-nosh` as your entry point.
-3. Ask for an outcome (for example, literature review, architecture, implementation, safety audit).
+3. Ask for an outcome (for example, literature review, architecture, implementation, safety audit). On the AI Startup side, the default BMAD sequence is product brief -> architecture -> sprint plan -> implementation.
 
 IDE prompts:
 
@@ -98,7 +107,9 @@ AI Lab:
 
 AI Startup:
 
-- Product discovery and architecture design
+- Product discovery via an AI product brief (PRD-equivalent)
+- System design and architecture
+- Delivery planning via AI sprint / work breakdown before implementation
 - System implementation (LLM app, fine-tuning, data/embedding pipelines)
 - Deployment, monitoring, evaluation, quality/safety gates
 

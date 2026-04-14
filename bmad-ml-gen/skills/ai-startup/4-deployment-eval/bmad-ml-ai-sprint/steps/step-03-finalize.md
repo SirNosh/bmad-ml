@@ -16,6 +16,6 @@
 
 3. Produce the sprint status artifact:
    - Update or create `ai-sprint-status.yaml` with: sprint number, start date, end date, goals, tasks, priorities, dependencies, risks
-   - This artifact will be used to track progress during the sprint and as input for the next sprint planning
+   - This artifact is the implementation-planning handoff between approved design and build execution, and it will also be used to track progress during the sprint and as input for the next sprint planning
 
 **STOP and WAIT for user approval. Do not suggest the next workflow or chain to another agent. The user or Nosh will decide next steps.**

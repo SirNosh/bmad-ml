@@ -8,10 +8,11 @@
    - Current product vision and roadmap priorities
    - Upcoming milestones or deadlines that constrain sprint scope
    - Stakeholder expectations for this sprint cycle
-3. Load `{planning_artifacts}/ai-architecture.md` for technical context:
+3. Load `{planning_artifacts}/ai-architecture.md` and any approved design-detail artifacts for technical context:
    - Current implementation status: what is built, what remains
    - Technical debt items that may affect sprint work
    - Dependencies on external teams or services
+   - Design decisions that must be preserved during implementation handoff
 4. Define sprint scope and goals:
    - Sprint duration (1 week, 2 weeks, or custom)
    - Sprint theme or objective (e.g., "Complete RAG pipeline MVP", "Address safety audit findings", "Performance optimization sprint")

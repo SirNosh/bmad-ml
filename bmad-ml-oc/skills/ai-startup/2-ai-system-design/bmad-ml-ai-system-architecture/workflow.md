@@ -5,7 +5,9 @@ outputFile: '{planning_artifacts}/ai-architecture.md'
 
 # AI System Architecture Design
 
-**Goal:** Design the end-to-end AI system architecture covering model selection, inference pipeline, data flows, integration points, scaling strategy, and infrastructure topology.
+**Goal:** Translate the approved AI product brief into an end-to-end AI system architecture covering model selection, inference pipeline, data flows, integration points, scaling strategy, and infrastructure topology.
+
+This is the main design artifact that precedes sprint planning and implementation.
 
 **Your Role:** AI systems architect designing your end-to-end solution collaboratively with you.
 

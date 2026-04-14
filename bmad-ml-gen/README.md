@@ -17,12 +17,23 @@ The two divisions:
 
 Both divisions share a single orchestrator (**Nosh**) and a common configuration system.
 
+## AI Startup and Base BMad
+
+On the AI Startup side, BMad ML intentionally keeps the planning backbone that makes base BMAD effective, while adapting the artifacts for AI product work:
+
+- `bmad-ml-ai-product-brief` is the AI Startup PRD-equivalent. It captures the problem, users, constraints, success metrics, risks, and recommended direction.
+- `bmad-ml-ai-system-architecture` turns the approved brief into a buildable system design.
+- `bmad-ml-ai-sprint` breaks the approved design into implementation-ready work, priorities, dependencies, and risks before build execution starts.
+- Nosh keeps this flow explicit in AI Startup mode: brief -> architecture -> sprint plan -> implementation -> evaluation/safety -> deployment/review.
+
+This BMAD mapping is intentional for AI Startup only. The AI Lab side keeps its research-first workflow model.
+
 ## How You Interact With It
 
 There are three ways to engage -- pick whichever matches how you like to work:
 
 1. **Talk to an agent directly.** Invoke a skill like `bmad-ml-sova`, `bmad-ml-chamber`, or `bmad-ml-dumbledore` and ask for the outcome you need. The agent picks the right workflow and runs it.
-2. **Talk to Nosh** (`bmad-ml-nosh`). The orchestrator routes you to the right agent, chains agents autonomously in AI Lab mode, or facilitates phase gates in AI Startup mode. Good when you don't know which specialist to reach for.
+2. **Talk to Nosh** (`bmad-ml-nosh`). The orchestrator routes you to the right agent, chains agents autonomously in AI Lab mode, or facilitates phase gates in AI Startup mode. In AI Startup, Nosh keeps the BMAD planning spine explicit: product brief -> architecture -> sprint planning -> implementation. Good when you don't know which specialist to reach for.
 3. **Convene a meeting.** Invoke a party or meeting skill to get multiple agents in one room -- `bmad-ml-research-party` (research agents only), `bmad-ml-lab-meeting` (AI Lab division), `bmad-ml-startup-meeting` (AI Startup division), or `bmad-ml-all-hands` (both divisions).
 
 ## Agent Roster
@@ -155,7 +166,7 @@ The `.claude-plugin/marketplace.json` manifest enables plugin discovery. Despite
 1. Open your project in Claude Code
 2. Reference a skill by name in your prompt:
   - **"load bmad-ml-nosh"** -- starts the orchestrator
-  - **"load bmad-ml-dumbledore and draft an AI product brief for a legal assistant"** -- invokes the specialist directly
+  - **"load bmad-ml-dumbledore and draft an AI product brief (PRD-equivalent) for a legal assistant"** -- invokes the specialist directly
 3. Claude Code discovers skills from `.claude/skills/` automatically
 4. All agents run within the same conversation (sequential persona swapping)
 
@@ -166,7 +177,7 @@ The `.claude-plugin/marketplace.json` manifest enables plugin discovery. Despite
 - `bmad-ml-sova` -- "Do a literature review on retrieval-augmented generation."
 - `bmad-ml-chamber` -- "Design a mixture-of-experts architecture for a 7B base model."
 - `bmad-ml-jett` -- "Implement the experiment we designed last session and run a micro-batch test."
-- `bmad-ml-dumbledore` -- "Draft an AI product brief for a legal document assistant."
+- `bmad-ml-dumbledore` -- "Draft an AI product brief (PRD-equivalent) for a legal document assistant."
 - `bmad-ml-hermione` -- "Build the LLM application from the approved architecture."
 - `bmad-ml-snape` -- "Red-team the deployed assistant for prompt injection."
 
@@ -206,7 +217,7 @@ bmad-ml-gen/
       agents/              # 7 Harry Potter agents (Dumbledore, Hermione, Snape, Luna, McGonagall, Moody, Hagrid)
       party/               # Startup Meeting
       onboarding/          # AI product onboarding
-      1-product-discovery/ # AI product brief
+      1-product-discovery/ # AI product brief (PRD-equivalent)
       2-ai-system-design/  # Architecture, RAG, agents, prompts, guardrails
       3-implementation/    # Build LLM app, fine-tuning, vector DB, etc.
       4-deployment-eval/   # Deploy, monitor, evaluate, safety audit, sprint

@@ -38,6 +38,19 @@ See the [Agent Roster](#agent-roster) below for the full list and whose expertis
 
 On activation, Nosh loads the config, searches for `project-context.md`, `iteration-log.yaml`, and `experiment-status.yaml`, then presents the appropriate division's capability menu and waits for your selection. Nosh never generates model code or reads implementation files directly -- he delegates to Jett (implementation) or Omen (review).
 
+## AI Startup Base BMad Backbone
+
+On the AI Startup side, BMad ML intentionally preserves the planning backbone that makes base BMAD useful:
+
+1. `bmad-ml-ai-product-brief` is the PRD-equivalent artifact.
+2. `bmad-ml-ai-system-architecture` translates the approved brief into a buildable system design.
+3. Optional design-detail workflows refine specific parts of the architecture (`bmad-ml-rag-pipeline`, `bmad-ml-agent-system`, `bmad-ml-prompt-engineering`, `bmad-ml-data-integration`, and related design skills).
+4. `bmad-ml-ai-readiness-check` confirms the design is ready for delivery planning.
+5. `bmad-ml-ai-sprint` breaks the approved design into implementation-ready work, priorities, dependencies, and risks.
+6. Build, evaluate, secure, and deploy from the approved plan.
+
+This BMAD mapping applies to AI Startup only. AI Lab keeps its research-first flow.
+
 ## Agent Capability Reference
 
 The next two sections list all workflows by phase. These are the tools agents use, not a separate menu you navigate. In practice you ask an agent ("Sova, do a literature review on retrieval-augmented generation" or "Chamber, design a MoE architecture for this problem"), and the agent invokes the appropriate workflow. The tables below let you look up which workflow produces which artifact and which modes it supports -- useful for debugging, audits, and understanding what to expect.
@@ -92,12 +105,12 @@ The next two sections list all workflows by phase. These are the tools agents us
 
 ### AI Startup Workflows
 
-#### Phase 1: Product Discovery
+#### Phase 1: Product Discovery (PRD-equivalent planning)
 
 | Workflow | Produces | Modes |
 |----------|----------|-------|
 | `bmad-ml-onboard-startup` | project-context.md, component catalog | Create / Re-scan |
-| `bmad-ml-ai-product-brief` | ai-product-brief.md | Create / Iterate |
+| `bmad-ml-ai-product-brief` | ai-product-brief.md (PRD-equivalent) | Create / Iterate |
 
 #### Phase 2: AI System Design
 
@@ -114,7 +127,13 @@ The next two sections list all workflows by phase. These are the tools agents us
 | `bmad-ml-guardrails-design` | guardrails-spec.md | Create / Iterate |
 | `bmad-ml-ai-readiness-check` | PASS / CONCERNS / FAIL | Always fresh |
 
-#### Phase 3: Implementation
+#### Phase 2.5: Delivery Planning
+
+| Workflow | Produces | Modes |
+|----------|----------|-------|
+| `bmad-ml-ai-sprint` | ai-sprint-status.yaml (implementation plan) | Update |
+
+#### Phase 3: Implementation (after sprint plan sign-off)
 
 | Workflow | Produces | Modes |
 |----------|----------|-------|
@@ -142,7 +161,6 @@ The next two sections list all workflows by phase. These are the tools agents us
 | `bmad-ml-prompt-injection-test` | Vulnerability report | Always fresh |
 | `bmad-ml-red-team` | Red team report | Always fresh |
 | `bmad-ml-ai-product-review` | Release verdict | Always fresh |
-| `bmad-ml-ai-sprint` | ai-sprint-status.yaml | Update |
 
 #### Cross-Phase
 
@@ -229,7 +247,7 @@ These agents turn research direction into running code, reviews, and optimized m
 These seven agents operate in hands-on collaborative mode only. Every phase transition requires explicit user approval -- they present options and wait.
 
 **Dumbledore** -- Chief AI Product Architect. Sees the grand design where others see components. Has architected systems serving 100M+ users. Speaks in reversible decisions and graceful degradation.
-- **Invoke for:** AI product brief (`AB`), AI system architecture (`AA`), RAG pipeline design (`RG`), agent system design (`AS`), AI readiness check (`RC`), AI sprint planning (`SP`).
+- **Invoke for:** AI product brief / PRD-equivalent (`AB`), AI system architecture (`AA`), RAG pipeline design (`RG`), agent system design (`AS`), AI readiness check (`RC`), AI sprint planning / work breakdown (`SP`).
 - **Expertise:** LLM stack selection, prompt routing, agent frameworks (LangChain, CrewAI, AutoGen), vector DBs (Pinecone, Weaviate, Qdrant, ChromaDB), RAG variants, serving infrastructure.
 
 **Hermione** -- Senior AI/ML Engineer. Turns architecture documents into working systems. Clean, tested, production-grade code at speed. Will push back on the architecture if implementation reveals flaws.
@@ -472,7 +490,7 @@ Nosh presents these two-letter codes as a menu on activation. Invoke a capabilit
 | `AU` | AI Safety Audit | `bmad-ml-ai-safety-audit` |
 | `QA` | AI QA & Evaluation | `bmad-ml-ai-evaluation` |
 | `DI` | Data Integration Pipeline | `bmad-ml-data-integration` |
-| `SP` | AI Product Sprint | `bmad-ml-ai-sprint` |
+| `SP` | AI Sprint Planning / Work Breakdown | `bmad-ml-ai-sprint` |
 | `PR` | AI Product Review | `bmad-ml-ai-product-review` |
 | `SM` | Startup Meeting (Startup division only) | `bmad-ml-startup-meeting` |
 | `AH` | All-Hands (BOTH divisions) | `bmad-ml-all-hands` |
@@ -517,10 +535,10 @@ These recipes show two equivalent paths: **talking to agents directly** and **as
 
 **Agent-first path:**
 1. `ml-setup` -- configure the module
-2. Ask Dumbledore to write the product brief and design the AI system architecture
-3. Ask Luna to design the prompt strategy; ask Hagrid for the data integration layer
-4. Ask Snape to design guardrails before implementation begins
-5. Ask Hermione to build the LLM application from the approved design
+2. Ask Dumbledore to write the PRD-equivalent product brief and design the AI system architecture
+3. Ask Luna, Hagrid, or other Startup specialists to refine prompts, data integration, and other design details as needed
+4. Ask Dumbledore to turn the approved design into an AI sprint plan / work breakdown
+5. Ask Hermione to build the LLM application from the approved plan
 6. Ask Moody for evaluation and Snape for a safety audit
 7. Ask McGonagall to deploy it
 
