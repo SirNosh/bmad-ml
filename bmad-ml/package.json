@@ -1,0 +1,17 @@
+{
+  "name": "bmad-ml",
+  "version": "1.0.0",
+  "description": "Installer for BMad ML skills and OpenCode agents",
+  "bin": {
+    "bmad-ml": "bin/cli.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "content/"
+  ],
+  "license": "MIT"
+}
+
+
+
