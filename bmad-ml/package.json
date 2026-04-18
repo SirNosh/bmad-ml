@@ -1,6 +1,6 @@
 {
   "name": "bmad-ml",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "Installer for BMad ML skills across Cursor, Claude Code, OpenCode, and pi/hybrid targets",
   "bin": {
     "bmad-ml": "bin/cli.js"
@@ -13,7 +13,7 @@
     "bmad-ml-pi/"
   ],
   "scripts": {
-    "test": "node --test lib/pi-model-picker.test.js bmad-ml-pi/hybrid/dispatch-pi.test.mjs"
+    "test": "node --test lib/install-manifest.test.js lib/pi-model-picker.test.js bmad-ml-pi/hybrid/dispatch-pi.test.mjs"
   },
   "license": "MIT"
 }

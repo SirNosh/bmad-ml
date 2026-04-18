@@ -200,7 +200,7 @@ async function runModelPicker({
 } = {}) {
   try {
     if (skipPicker) {
-      stdout.write("Model picker: skipped (--no-model-picker)\n");
+      stdout.write("Model picker: skipped (use --model-picker to configure per-agent models; pi's default model will be used otherwise).\n");
       return { status: "skipped", reason: "flag" };
     }
 

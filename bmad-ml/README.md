@@ -38,6 +38,12 @@ All modes delegate specialist work via the Task/Agent tool with `subagent_type: 
 - `--with-project-instructions` install bootstrap AGENTS/CLAUDE templates (default for `--cur`/`--cc`)
 - `--no-project-instructions` skip bootstrap templates for `--cur`/`--cc`
 - `--logging` install optional subagent hook scripts
+- `--model-picker` run the pi model picker during `--cc-pi`/`--cur-pi` install (default: skip and use pi's own default model)
+- `--no-refresh` disable auto-refresh of managed files when the installed version differs from the package version
+
+## Upgrades
+
+Re-running the installer after upgrading `bmad-ml` (e.g. `npm i -g bmad-ml@latest` or a fresh `npx` version) detects the version change via `_bmad/install-manifest.json` and refreshes managed files automatically. A legacy install without a manifest is detected via mode-specific marker directories and refreshed on first re-run. Pass `--no-refresh` to keep existing files even on an upgrade; pass `--force` to reinstall at any time.
 
 ## First Session
 

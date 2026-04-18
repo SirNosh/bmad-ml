@@ -19,6 +19,11 @@ const {
   renderMatrix,
   renderLearnMoreHint,
 } = require("../lib/docs");
+const {
+  readPackageVersion,
+  writeInstalledManifest,
+  computeAutoUpgrade,
+} = require("../lib/install-manifest");
 
 const ALIASES = {
   "--opencode": "--oc",
@@ -40,7 +45,8 @@ const INSTALL_ONLY_FLAGS = [
   "--with-project-instructions",
   "--no-project-instructions",
   "--logging",
-  "--no-model-picker",
+  "--model-picker",
+  "--no-refresh",
 ];
 
 const KNOWN_FLAGS = new Set([
@@ -74,7 +80,8 @@ Install options:
   --with-project-instructions Install AGENTS.md / CLAUDE.md bootstrap (default for --cur/--cc)
   --no-project-instructions   Skip bootstrap install for --cur/--cc
   --logging                   Install optional subagent logging hook scripts
-  --no-model-picker           Skip pi model picker during --cc-pi/--cur-pi install
+  --model-picker              Run the pi model picker during --cc-pi/--cur-pi install (default: use pi's own default model)
+  --no-refresh                Disable auto-refresh of managed files on version upgrade
 
 Docs options:
   --about                What BMad ML is and how it is organized
@@ -140,7 +147,8 @@ function parseArgs(argv) {
       args.has("--with-project-instructions") ||
       args.has("--no-project-instructions") ||
       args.has("--logging") ||
-      args.has("--no-model-picker")
+      args.has("--model-picker") ||
+      args.has("--no-refresh")
     ) {
       throw new Error("Install-only flags require an install target");
     }
@@ -154,7 +162,8 @@ function parseArgs(argv) {
       args.has("--with-project-instructions") ||
       args.has("--no-project-instructions") ||
       args.has("--logging") ||
-      args.has("--no-model-picker")
+      args.has("--model-picker") ||
+      args.has("--no-refresh")
     ) {
       throw new Error("Install-only flags cannot be combined with docs flags");
     }
@@ -172,7 +181,8 @@ function parseArgs(argv) {
     dryRun: args.has("--dry-run"),
     withProjectInstructions: !args.has("--no-project-instructions"),
     withLogging: args.has("--logging"),
-    skipPicker: args.has("--no-model-picker"),
+    skipPicker: !args.has("--model-picker"),
+    noRefresh: args.has("--no-refresh"),
   };
 }
 
@@ -404,8 +414,19 @@ async function main() {
     return;
   }
 
-  const { ide, force, dryRun, withProjectInstructions, withLogging, skipPicker } = parsed;
+  const { ide, force: userForce, dryRun, withProjectInstructions, withLogging, skipPicker, noRefresh } = parsed;
   const paths = resolvePaths(ide);
+  const projectRoot = process.cwd();
+  const packageVersion = readPackageVersion(path.resolve(__dirname, "..", "package.json"));
+  const upgradeInfo = computeAutoUpgrade({ ide, projectRoot, noRefresh, packageVersion });
+
+  if (upgradeInfo.autoUpgrade && upgradeInfo.reason === "version-mismatch") {
+    console.log(`[upgrade] Refreshing bmad-ml managed files: ${upgradeInfo.installedVersion} -> ${packageVersion}`);
+  } else if (upgradeInfo.autoUpgrade && upgradeInfo.reason === "legacy") {
+    console.log(`[upgrade] Legacy bmad-ml install detected (no manifest). Refreshing managed files to ${packageVersion}.`);
+  }
+
+  const force = userForce || upgradeInfo.autoUpgrade;
 
   try {
     const skillResult = installSkills({
@@ -611,6 +632,12 @@ async function main() {
         stderr: process.stderr,
         env: process.env,
       });
+    }
+
+    if (dryRun) {
+      console.log(`[dry-run] Would write _bmad/install-manifest.json (version ${packageVersion}, mode ${ide}).`);
+    } else {
+      writeInstalledManifest(projectRoot, { version: packageVersion, mode: ide });
     }
 
     printNextSteps({ ide, paths, dryRun, withProjectInstructions, withLogging });

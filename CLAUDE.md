@@ -38,7 +38,8 @@ npx bmad-ml --cc-pi           # Claude Code + pi subagent mode
 npx bmad-ml --dry-run         # Preview without writing
 npx bmad-ml --force           # Overwrite existing installed files
 npx bmad-ml --logging         # Install optional subagent logging hooks (cur/cc/cur-pi/cc-pi)
-npx bmad-ml --no-model-picker # Skip pi model picker during --cc-pi/--cur-pi install
+npx bmad-ml --model-picker    # Opt into the pi model picker during --cc-pi/--cur-pi install (default: use pi's own default model)
+npx bmad-ml --no-refresh      # Disable auto-refresh of managed files on version upgrade
 ```
 
 Aliases: `--opencode`, `--cursor`, `--claude-code`, `--cursor-pi`, `--claude-code-pi`. The former `--cur-sub` / `--cc-sub` flags (and their aliases) have been removed -- `--cur` / `--cc` now install the subagent-based layout directly.
@@ -110,8 +111,8 @@ The former in-process `bmad-ml-pi/subagent-extension/` (a pi-runtime TypeScript 
 | `--oc` | `.opencode/skills/`, `.opencode/agents/` |
 | `--cur` | `.cursor/skills/`, `.cursor/agents/` (21 files: 20 specialists + Nosh), `AGENTS.md`, `.cursor/rules/`, `.cursor/hooks.json`, optional `.cursor/hooks/` |
 | `--cc` | `.claude/skills/`, `.claude/agents/` (21 files: 20 specialists + Nosh), `CLAUDE.md`, `.claude/rules/`, `.claude/settings.json` (merged — `"agent": "bmad-ml-nosh"` + `permissions` + `hooks.SubagentStart`/`SubagentStop`), `DELEGATION.md` overlay, optional `.claude/hooks/` |
-| `--cur-pi` | `.pi/skills/`, `.bmad-ml/dispatch-pi.{mjs,sh}`, `.cursor/skills/`, `.cursor/agents/`, `AGENTS.md`, `.cursor/rules/`, optional `.cursor/hooks/` + `.cursor/hooks.json`, plus interactive pi model pick written to `.pi/settings.json` (unless `--no-model-picker`) |
-| `--cc-pi` | `.pi/skills/`, `.bmad-ml/dispatch-pi.{mjs,sh}`, `.claude/skills/`, `.claude/agents/`, `CLAUDE.md`, `.claude/rules/`, `.claude/settings.json` (merged — `permissions` + `hooks.SubagentStart`/`SubagentStop`), `DELEGATION.md` overlay, optional `.claude/hooks/`, plus interactive pi model pick written to `.pi/settings.json` (unless `--no-model-picker`) |
+| `--cur-pi` | `.pi/skills/`, `.bmad-ml/dispatch-pi.{mjs,sh}`, `.cursor/skills/`, `.cursor/agents/`, `AGENTS.md`, `.cursor/rules/`, optional `.cursor/hooks/` + `.cursor/hooks.json`, plus interactive pi model pick written to `.pi/settings.json` (only when `--model-picker` is passed) |
+| `--cc-pi` | `.pi/skills/`, `.bmad-ml/dispatch-pi.{mjs,sh}`, `.claude/skills/`, `.claude/agents/`, `CLAUDE.md`, `.claude/rules/`, `.claude/settings.json` (merged — `permissions` + `hooks.SubagentStart`/`SubagentStop`), `DELEGATION.md` overlay, optional `.claude/hooks/`, plus interactive pi model pick written to `.pi/settings.json` (only when `--model-picker` is passed) |
 
 `AGENTS.md` / `CLAUDE.md` merges use `<!-- bmad-ml:start -->` / `<!-- bmad-ml:end -->` markers. Without markers in the existing file, the managed block is appended; with markers, the block is replaced only under `--force`. `.claude/settings.json` merges use deep-merge with array-union semantics (see `lib/install.js:mergeJsonPatch`) — top-level scalar keys like `"agent"` merge by replacement. Cursor does not have a project-scope `.cursor/settings.json` in its official spec — permissions/hooks are declared via `.cursor/hooks.json` and user-scope `~/.cursor/permissions.json`, so bmad-ml never writes `.cursor/settings.json`.
 
