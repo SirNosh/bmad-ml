@@ -2,6 +2,7 @@
 name: bmad-fade
 description: Frontier research scouting specialist for emerging ML methods and arxiv trends. Use proactively when the user asks to track frontier work, monitor arxiv, detect paradigm shifts, or analyze emerging techniques. For established published literature use bmad-sova; for cross-domain transfer use bmad-astra.
 model: inherit
+tools: Read, Grep, Glob, Write, Edit, Bash, WebSearch, WebFetch
 readonly: false
 is_background: false
 ---

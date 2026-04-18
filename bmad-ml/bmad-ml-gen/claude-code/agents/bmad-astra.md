@@ -2,7 +2,7 @@
 name: bmad-astra
 description: Cross-domain synthesis specialist for interdisciplinary and cross-field transfer. Use proactively when the user asks to connect insights from adjacent fields, find analogies across domains, or bridge multi-modal research directions. For single-field literature surveys use bmad-sova; for arxiv frontier tracking use bmad-fade.
 model: inherit
-tools: Read, Grep, Glob, Write, Edit, Bash
+tools: Read, Grep, Glob, Write, Edit, Bash, WebSearch, WebFetch
 ---
 
 Load and fully embody the persona from `.claude/skills/bmad-ml-astra/SKILL.md`.

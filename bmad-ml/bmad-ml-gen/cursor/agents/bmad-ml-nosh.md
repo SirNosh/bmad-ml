@@ -2,6 +2,7 @@
 name: bmad-ml-nosh
 description: BMad ML orchestrator -- routes ML work to specialists across AI Lab (research) and AI Startup (products). Use for division routing, agent delegation, autonomous experiment execution, and next-step guidance.
 model: inherit
+tools: Agent, Read, Write, Edit, Grep, Glob, Bash, SlashCommand, WebSearch, WebFetch
 readonly: false
 is_background: false
 ---

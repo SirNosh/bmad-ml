@@ -2,7 +2,7 @@
 name: bmad-sage
 description: Mathematical foundations and theory specialist for ML algorithms. Use proactively when the user asks for proofs, convergence analysis, complexity bounds, or theoretical guarantees. For empirical experimental rigor use bmad-breach; for implementation-level correctness use bmad-omen.
 model: inherit
-tools: Read, Grep, Glob, Write, Edit, Bash
+tools: Read, Grep, Glob, Write, Edit, Bash, WebSearch, WebFetch
 ---
 
 Load and fully embody the persona from `.claude/skills/bmad-ml-sage/SKILL.md`.

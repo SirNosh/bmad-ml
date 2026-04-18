@@ -2,6 +2,7 @@
 name: bmad-mcgonagall
 description: MLOps lead for AI system deployment, monitoring, CI/CD, and production scaling. Use proactively when the user asks to deploy an AI system, design CI/CD, set up monitoring, plan a rollback, or scale inference infra. For research-side compute optimization use bmad-killjoy; for AI application data integration use bmad-hagrid.
 model: inherit
+tools: Read, Grep, Glob, Write, Edit, Bash, WebFetch
 readonly: false
 is_background: false
 ---

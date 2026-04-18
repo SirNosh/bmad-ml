@@ -2,6 +2,7 @@
 name: bmad-cypher
 description: Dataset quality and bias diagnostics specialist for research datasets. Use proactively when the user asks to assess dataset quality, audit for bias, evaluate benchmarks, or flag distributional issues. For AI application data integration and embeddings use bmad-hagrid; for data pipeline plumbing inside experiments use bmad-gekko.
 model: inherit
+tools: Read, Grep, Glob, Write, Edit, Bash, WebSearch, WebFetch
 readonly: false
 is_background: false
 ---

@@ -66,6 +66,10 @@ npx bmad-ml --pi-subagent-guide
 - `--cur-pi` -> `.pi/skills/`, `.cursor/agents/`, `.cursor/rules/`, `.bmad-ml/dispatch-pi.mjs`
 - `--cc-pi` -> `.pi/skills/`, `.claude/agents/`, `.claude/rules/`, `.bmad-ml/dispatch-pi.mjs`
 
+## Web Access (3.1.0)
+
+Research agents get web access (WebSearch + WebFetch, or the host equivalent). Other agents do not.
+
 ### Agent Teams (Claude Code only, experimental)
 
 The four party/meeting skills (`bmad-ml-lab-meeting`, `bmad-ml-startup-meeting`, `bmad-ml-research-party`, `bmad-ml-all-hands`) can optionally use agent teams for multi-specialist discussion. Enable by exporting `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` before starting Claude Code. The installer does not write this env var -- opt in manually. Without it, these workflows fall back to serial Task dispatch.

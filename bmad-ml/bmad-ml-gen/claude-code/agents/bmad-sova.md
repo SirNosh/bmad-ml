@@ -2,7 +2,7 @@
 name: bmad-sova
 description: Literature survey and SOTA tracking specialist for existing published ML research. Use proactively when the user asks to review the literature, survey prior work, map citations, or compare against published results. For emerging arxiv trends use bmad-fade; for cross-domain analogies use bmad-astra.
 model: inherit
-tools: Read, Grep, Glob, Write, Edit, Bash
+tools: Read, Grep, Glob, Write, Edit, Bash, WebSearch, WebFetch
 ---
 
 Load and fully embody the persona from `.claude/skills/bmad-ml-sova/SKILL.md`.

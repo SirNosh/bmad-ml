@@ -2,6 +2,7 @@
 name: bmad-jett
 description: Fast-executing ML engineer for research experiment implementation and rapid prototyping. Use proactively when the user asks to code up an experiment, implement a research idea, or build a quick ML prototype. For production LLM apps and shipping to users use bmad-hermione; for data pipelines inside experiments use bmad-gekko.
 model: inherit
+tools: Read, Grep, Glob, Write, Edit, Bash, WebFetch
 readonly: false
 is_background: false
 ---

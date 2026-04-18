@@ -2,6 +2,7 @@
 name: bmad-hagrid
 description: Data integration specialist for AI applications: ingestion, embeddings, and vector databases. Use proactively when the user asks to design data ingestion, build an embedding pipeline, set up a vector DB, or integrate document-processing for retrieval. For research dataset quality audit use bmad-cypher; for ML-experiment DataLoader optimization use bmad-gekko.
 model: inherit
+tools: Read, Grep, Glob, Write, Edit, Bash, WebFetch
 readonly: false
 is_background: false
 ---

@@ -1,6 +1,6 @@
 {
   "name": "bmad-ml",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Installer for BMad ML skills across Cursor, Claude Code, OpenCode, and pi/hybrid targets",
   "bin": {
     "bmad-ml": "bin/cli.js"

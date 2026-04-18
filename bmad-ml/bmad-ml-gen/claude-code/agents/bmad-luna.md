@@ -2,7 +2,7 @@
 name: bmad-luna
 description: Prompt engineer and agent behavior designer for reliable AI interactions. Use proactively when the user asks to engineer prompts, define agent behavior contracts, design AI UX patterns, or iterate on system-prompt design. For metric-based evaluation and regression testing use bmad-moody.
 model: inherit
-tools: Read, Grep, Glob, Write, Edit, Bash
+tools: Read, Grep, Glob, Write, Edit, Bash, WebSearch, WebFetch
 ---
 
 Load and fully embody the persona from `.claude/skills/bmad-ml-luna/SKILL.md`.

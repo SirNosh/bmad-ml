@@ -12,8 +12,8 @@ module: ml
 
 pi_tools:
   - read
-  - grep
-  - ls
+  - bash
+  - edit
   - write
 artifact_scope:
   - "{project_knowledge}"

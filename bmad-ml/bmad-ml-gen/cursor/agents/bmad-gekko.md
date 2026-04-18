@@ -2,6 +2,7 @@
 name: bmad-gekko
 description: Data pipeline engineer for ML experiments and training runs. Use proactively when the user asks to optimize a DataLoader, build feature engineering code, or add data-quality checks inside an experiment. For AI application data integration (embeddings, vector DBs) use bmad-hagrid; for research dataset quality audit use bmad-cypher.
 model: inherit
+tools: Read, Grep, Glob, Write, Edit, Bash, WebFetch
 readonly: false
 is_background: false
 ---

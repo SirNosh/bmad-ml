@@ -241,6 +241,9 @@ When running in pi mode, delegate specialist work exclusively through `bmad_task
 - `constraints`
 - `mode`
 
+### Research subagents have web access
+Research agents (sova, sage, cypher, viper, breach, fade, astra, killjoy) have web access in pi mode. When delegating to them, assume they can look things up online -- do NOT tell them web search is unavailable, and do NOT restrict them to local artifacts only. Encourage active web use in the directive when literature, benchmarks, or external references are in scope.
+
 ### Watching subagents
 - Maintain compact status updates per running subagent.
 - Surface warning conditions (tool loops, high cost, stalled execution).

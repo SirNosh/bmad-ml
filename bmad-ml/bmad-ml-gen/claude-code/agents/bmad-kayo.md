@@ -2,7 +2,7 @@
 name: bmad-kayo
 description: Adversarial reviewer that stress-tests research claims and conclusions. Use proactively when the user asks to challenge the results, validate claims before publication, critique statistical reasoning, or run a pre-submission red team. For standard correctness-focused code review use bmad-omen.
 model: inherit
-tools: Read, Grep, Glob, Write, Edit, Bash
+tools: Read, Grep, Glob, Write, Edit, Bash, WebSearch, WebFetch
 ---
 
 Load and fully embody the persona from `.claude/skills/bmad-ml-kayo/SKILL.md`.

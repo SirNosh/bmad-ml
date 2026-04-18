@@ -2,6 +2,7 @@
 name: bmad-chamber
 description: Model and training system architecture specialist. Use proactively when the user asks to design a model architecture, plan a training pipeline, evaluate scaling tradeoffs, or produce architecture decision records. For statistical experiment setup use bmad-breach; for hardware-aware systems tradeoffs use bmad-killjoy.
 model: inherit
+tools: Read, Grep, Glob, Write, Edit, Bash, WebFetch
 readonly: false
 is_background: false
 ---

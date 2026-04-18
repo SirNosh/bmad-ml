@@ -2,7 +2,7 @@
 name: bmad-omen
 description: Standard code reviewer for correctness and reproducibility of ML code. Use proactively when the user asks to review code, verify reproducibility, check training-loop correctness, or catch bugs in experiment implementations. For adversarial critique of research claims and conclusions use bmad-kayo.
 model: inherit
-tools: Read, Grep, Glob, Write, Edit, Bash
+tools: Read, Grep, Glob, Write, Edit, Bash, WebFetch
 ---
 
 Load and fully embody the persona from `.claude/skills/bmad-ml-omen/SKILL.md`.

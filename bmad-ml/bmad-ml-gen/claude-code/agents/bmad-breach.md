@@ -2,7 +2,7 @@
 name: bmad-breach
 description: Experimental methodology and statistical rigor specialist for research studies. Use proactively when the user asks to design an experiment, plan ablations, set statistical controls, or define reproducibility protocols. For model and training system design use bmad-chamber; for theoretical proofs use bmad-sage.
 model: inherit
-tools: Read, Grep, Glob, Write, Edit, Bash
+tools: Read, Grep, Glob, Write, Edit, Bash, WebSearch, WebFetch
 ---
 
 Load and fully embody the persona from `.claude/skills/bmad-ml-breach/SKILL.md`.

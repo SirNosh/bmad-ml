@@ -12,10 +12,9 @@ module: ml
 
 pi_tools:
   - read
-  - grep
-  - ls
+  - bash
+  - edit
   - write
-  - web_search
 artifact_scope:
   - "{project_knowledge}"
   - "{planning_artifacts}"

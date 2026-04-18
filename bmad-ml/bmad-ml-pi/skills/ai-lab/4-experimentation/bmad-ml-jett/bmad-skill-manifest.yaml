@@ -12,10 +12,9 @@ module: ml
 
 pi_tools:
   - read
-  - grep
-  - ls
-  - write
   - bash
+  - edit
+  - write
 artifact_scope:
   - "{planning_artifacts}"
   - "{experiment_artifacts}"

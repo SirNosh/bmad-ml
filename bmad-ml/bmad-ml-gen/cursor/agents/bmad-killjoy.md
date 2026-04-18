@@ -2,6 +2,7 @@
 name: bmad-killjoy
 description: Systems ML and hardware-aware optimization specialist. Use proactively when the user asks about compute budgets, distributed training strategies, inference optimization, or memory and throughput tradeoffs. For high-level model architecture decisions use bmad-chamber; for deployment and MLOps use bmad-mcgonagall.
 model: inherit
+tools: Read, Grep, Glob, Write, Edit, Bash, WebSearch, WebFetch
 readonly: false
 is_background: false
 ---
