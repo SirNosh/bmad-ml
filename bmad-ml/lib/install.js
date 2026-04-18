@@ -349,46 +349,46 @@ function mergeAgentsMd({
   };
 }
 
-function ensurePiSettings({
-  settingsPath,
-  extensionName,
-  force = false,
-  dryRun = false,
-}) {
-  let parsed = {};
-  if (fs.existsSync(settingsPath)) {
-    try {
-      parsed = JSON.parse(fs.readFileSync(settingsPath, "utf8"));
-    } catch {
-      if (!force) {
-        throw new Error(`Invalid JSON in settings file: ${settingsPath} (rerun with --force to replace)`);
-      }
-      parsed = {};
+function isPlainObject(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function mergeArraysUnique(currentArray, patchArray) {
+  const merged = [];
+  const seen = new Set();
+
+  for (const item of [...currentArray, ...patchArray]) {
+    const key = isPlainObject(item) || Array.isArray(item)
+      ? JSON.stringify(item)
+      : String(item);
+    if (seen.has(key)) {
+      continue;
     }
+    seen.add(key);
+    merged.push(item);
   }
 
-  const settings = parsed;
-  settings.extensions = settings.extensions ?? {};
-  settings.extensions.enabled = Array.isArray(settings.extensions.enabled)
-    ? settings.extensions.enabled
-    : [];
+  return merged;
+}
 
-  const exists = settings.extensions.enabled.includes(extensionName);
-  if (!exists) {
-    settings.extensions.enabled.push(extensionName);
+function mergeValues(currentValue, patchValue) {
+  if (Array.isArray(patchValue)) {
+    const currentArray = Array.isArray(currentValue) ? currentValue : [];
+    return mergeArraysUnique(currentArray, patchValue);
   }
 
-  if (!dryRun && !exists) {
-    fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
-    fs.writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
+  if (isPlainObject(patchValue)) {
+    const currentObject = isPlainObject(currentValue) ? currentValue : {};
+    const merged = { ...currentObject };
+
+    for (const [key, value] of Object.entries(patchValue)) {
+      merged[key] = mergeValues(currentObject[key], value);
+    }
+
+    return merged;
   }
 
-  return {
-    targetFile: settingsPath,
-    installedCount: exists ? 0 : 1,
-    skippedCount: exists ? 1 : 0,
-    changed: !exists,
-  };
+  return patchValue;
 }
 
 function mergeJsonPatch({
@@ -415,17 +415,7 @@ function mergeJsonPatch({
     }
   }
 
-  const allowCurrent = current.permissions?.allow ?? [];
-  const allowPatch = patch.permissions?.allow ?? [];
-  const mergedAllow = Array.from(new Set([...(Array.isArray(allowCurrent) ? allowCurrent : []), ...(Array.isArray(allowPatch) ? allowPatch : [])]));
-
-  const next = {
-    ...current,
-    permissions: {
-      ...(current.permissions ?? {}),
-      allow: mergedAllow,
-    },
-  };
+  const next = mergeValues(current, patch);
 
   const changed = JSON.stringify(next) !== JSON.stringify(current);
   if (!dryRun && changed) {
@@ -447,6 +437,5 @@ module.exports = {
   installDirectory,
   installFile,
   mergeAgentsMd,
-  ensurePiSettings,
   mergeJsonPatch,
 };

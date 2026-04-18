@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "hooks": {
+    "subagentStart": [
+      { "command": ".cursor/hooks/subagent-log.sh" }
+    ],
+    "subagentStop": [
+      { "command": ".cursor/hooks/subagent-log.sh" }
+    ]
+  }
+}

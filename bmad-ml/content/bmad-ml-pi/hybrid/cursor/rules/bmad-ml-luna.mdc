@@ -1,5 +1,0 @@
----
-description: Invoke bmad-ml luna (pi-backed). Use only when Nosh routes a matching task.
----
-
-Build the curated payload, run `node .bmad-ml/dispatch-pi.mjs luna <prompt-file>`, and summarize streamed SubagentEvents.

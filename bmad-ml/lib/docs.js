@@ -1,4 +1,11 @@
-const DOC_FLAGS = ["--about", "--agents", "--workflows", "--opencode-guide", "--pi-guide"];
+const DOC_FLAGS = [
+  "--about",
+  "--agents",
+  "--workflows",
+  "--opencode-guide",
+  "--pi-subagent-guide",
+  "--matrix",
+];
 
 const docsData = {
   about: {
@@ -7,9 +14,12 @@ const docsData = {
       "BMad ML is an agent-first module for ML research and AI product engineering.",
       "You interact with specialist agents (personas), and they run workflows to produce artifacts.",
       "",
-      "Who this is for:",
-      "- Teams doing ML research, experimentation, and model architecture work.",
-      "- Teams building production AI products (LLM apps, RAG, agent systems, deployment).",
+      "Five install modes:",
+      "- --oc: OpenCode primary mode",
+      "- --cur: Cursor subagent mode (Nosh persona via AGENTS.md, specialists as fresh-context subagents)",
+      "- --cc: Claude Code subagent mode (Nosh as main-thread agent via `\"agent\"` setting, specialists as fresh-context subagents)",
+      "- --cur-pi: Cursor + pi hybrid (specialists dispatch to the pi CLI)",
+      "- --cc-pi: Claude Code + pi hybrid (specialists dispatch to the pi CLI)",
       "",
       "Two divisions:",
       "- AI Lab: research and experiments, supports autonomous multi-step execution.",
@@ -18,21 +28,32 @@ const docsData = {
       "Orchestrator:",
       "- Nosh (`bmad-ml-nosh`) routes work, coordinates agents, and recommends next steps.",
       "",
-      "AI Startup BMAD backbone:",
-      "- AI Product Brief = PRD-equivalent planning artifact.",
-      "- AI System Architecture = buildable solution design.",
-      "- AI Sprint = implementation work breakdown before build execution.",
-      "- Default order: brief -> architecture -> sprint plan -> implementation -> evaluation/safety -> deployment/review.",
+      "Agent invocation:",
+      "- All modes delegate specialist work via the Task/Agent tool with `subagent_type: \"bmad-<name>\"`.",
+      "- Auto-delegation, slash commands (/bmad-<name>), and @-mentions (@agent-<name>) are parsed",
+      "  from user input only -- they do nothing when emitted by Nosh in agent output.",
+      "",
+      "Persona binding:",
+      "- --cc: hard binding. The installer writes `\"agent\": \"bmad-ml-nosh\"` into `.claude/settings.json`,",
+      "  which replaces Claude Code's default system prompt with Nosh's persona per Claude Code docs.",
+      "  To opt out, remove the `\"agent\"` key from settings.json after install.",
+      "- --cur: soft binding. Cursor has no default-agent setting, so Nosh's persona loads via AGENTS.md",
+      "  at user-message level. A `.cursor/agents/bmad-ml-nosh.md` file is also installed for @-mention access.",
+      "",
+      "Agent teams (Claude Code, experimental):",
+      "- The four party/meeting skills (bmad-ml-lab-meeting, bmad-ml-startup-meeting,",
+      "  bmad-ml-research-party, bmad-ml-all-hands) can optionally use agent teams for multi-specialist",
+      "  discussion. Enable with `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in your shell environment.",
+      "- The installer does not write this env var anywhere; opt in manually.",
+      "- Without the env var, these workflows fall back to serial Task dispatch (no behavior change).",
     ],
   },
   agents: {
-    title: "Agent Roster (21 Personas + Nosh)",
+    title: "Agent Roster (20 Specialists + Nosh)",
     sections: [
       {
         heading: "Shared",
-        items: [
-          ["Nosh", "Orchestrator for routing, planning, and cross-division coordination."],
-        ],
+        items: [["Nosh", "Orchestrator for routing, planning, and cross-division coordination."]],
       },
       {
         heading: "AI Lab - Research (8)",
@@ -108,9 +129,7 @@ const docsData = {
       },
       {
         heading: "AI Startup - Delivery Planning",
-        items: [
-          ["bmad-ml-ai-sprint", "Produces ai-sprint-status.yaml (implementation plan)"],
-        ],
+        items: [["bmad-ml-ai-sprint", "Produces ai-sprint-status.yaml (implementation plan)"]],
       },
       {
         heading: "AI Startup - Implementation + Deployment + Evaluation",
@@ -137,12 +156,12 @@ const docsData = {
   opencode: {
     title: "OpenCode Install and Runtime Guide",
     lines: [
-      "What --opencode installs:",
+      "What --oc installs:",
       "- 75 skills into .opencode/skills/",
       "- 21 agent shims into .opencode/agents/",
       "",
       "How to start:",
-      "1. Run: npx bmad-ml --opencode",
+      "1. Run: npx bmad-ml --oc",
       "2. Start OpenCode in your project root: opencode",
       "3. Run ml-setup to create/update _bmad/config.yaml and _bmad/config.user.yaml",
       "4. Press Tab to switch to Nosh, then request your task.",
@@ -151,43 +170,63 @@ const docsData = {
       "- Agent shims make personas available as @invocable agents.",
       "- Nosh can delegate independent tasks in parallel using the Task tool.",
       "- Parallel windows are strongest in research, reviews, and meeting modes.",
-      "",
-      "Session navigation (OpenCode child sessions):",
-      "- Shift+Down: enter first child session",
-      "- Right / Left: cycle sibling child sessions",
-      "- Up: return to parent session",
-      "",
-      "If agent shims are missing, skills still run in sequential single-session mode.",
     ],
   },
-  pi: {
-    title: "pi and Hybrid Install Guide",
+  piSubagent: {
+    title: "pi Subagent Modes Guide",
     lines: [
-      "What --pi installs:",
-      "- Skills into .pi/skills/",
-      "- Prompt templates into .pi/prompts/",
-      "- pi extension into .pi/extensions/bmad-ml/",
-      "- Bootstrap block into .pi/AGENTS.md",
+      "Standalone --pi has been removed.",
+      "Use one of the hybrid pi modes:",
+      "- --cc-pi: Claude Code main chat is Nosh, specialists run as Claude subagent shims that dispatch to pi.",
+      "- --cur-pi: Cursor main chat is Nosh, specialists run as Cursor subagent shims that dispatch to pi.",
       "",
-      "What --cc-pi installs:",
-      "- pi skills + subagent extension runtime",
-      "- Dispatcher script at .bmad-ml/dispatch-pi.mjs",
-      "- Claude Nosh skill and specialist shims under .claude/",
-      "- Additive permissions patch in .claude/settings.json",
+      "Shared runtime behavior:",
+      "- pi skills are installed in .pi/skills/",
+      "- Dispatcher lives at .bmad-ml/dispatch-pi.mjs",
+      "- Specialist shims run: node .bmad-ml/dispatch-pi.mjs <agent> <prompt-file>",
       "",
-      "What --cursor-pi installs:",
-      "- pi skills + subagent extension runtime",
-      "- Dispatcher script at .bmad-ml/dispatch-pi.mjs",
-      "- Cursor rules under .cursor/rules/",
-      "- Sequential specialist dispatch fallback in Cursor mode",
+      "Install-time model picker:",
+      "- At the end of --cc-pi / --cur-pi install, the CLI runs `pi --list-models --mode json`",
+      "  and prompts for a default model applied to all 21 specialists via .pi/settings.json.",
+      "- Skips on: --no-model-picker, --dry-run, non-TTY stdin, pi missing, empty list, or 'q' response.",
+      "- Existing .pi/settings.json with bmad_ml.models.sova is preserved unless --force is passed.",
+      "- `bmad_ml` is a bmad-ml-private namespace read only by dispatch-pi.mjs; pi itself reads its own",
+      "  top-level keys (defaultProvider, defaultModel, defaultThinkingLevel, etc.) and ignores `bmad_ml`.",
+      "",
+      "Model string formats (accepted anywhere the dispatcher takes a model):",
+      "- pi-native:  provider/id[:thinking]   e.g.  anthropic/claude-sonnet-4:high",
+      "- legacy:     provider:id              e.g.  anthropic:claude-sonnet-4",
       "",
       "Model resolution order:",
-      "- Invocation override",
-      "- .pi/settings.json bmad_ml.models.<agent>",
-      "- _bmad/config.user.yaml ml.pi_models.<agent>",
-      "- _bmad/config.yaml ml.pi_models.<agent>",
+      "- Invocation override: --model <string>",
+      "- .pi/settings.json (bmad_ml.models.<agent>)",
+      "- _bmad/config.user.yaml (ml.pi_models.<agent>)",
+      "- _bmad/config.yaml (ml.pi_models.<agent>)",
+      "- Per-agent env: BMAD_PI_MODEL_<AGENT>=<string> (+ optional BMAD_PI_REASONING_<AGENT>)",
+      "  Agent name is uppercased with hyphens -> underscores (e.g. research-party -> RESEARCH_PARTY).",
       "- Skill manifest pi_model",
-      "- Environment fallback",
+      "- Environment fallback (PI_PROVIDER/PI_MODEL or BMAD_PI_PROVIDER/BMAD_PI_MODEL, defaults opencode-go:glm-5.1)",
+    ],
+  },
+  matrix: {
+    title: "BMad ML Mode Matrix",
+    lines: [
+      "1) --oc      (alias: --opencode)         OpenCode primary mode",
+      "2) --cur     (alias: --cursor)           Cursor subagent mode (Nosh via AGENTS.md, soft binding)",
+      "3) --cc      (alias: --claude-code)      Claude Code subagent mode (Nosh as main-thread agent, hard binding)",
+      "4) --cur-pi  (alias: --cursor-pi)        Cursor subagent shims dispatching to pi",
+      "5) --cc-pi   (alias: --claude-code-pi)   Claude subagent shims dispatching to pi",
+      "",
+      "All modes delegate specialist work via the Task/Agent tool with `subagent_type: \"bmad-<name>\"`.",
+      "Auto-delegation and @-mentions operate on user input, not on agent output -- Nosh never emits",
+      "slash commands or @agent-<name> mentions.",
+      "",
+      "Persona binding:",
+      "- --cc writes `\"agent\": \"bmad-ml-nosh\"` to `.claude/settings.json` (replaces default system prompt).",
+      "- --cur uses AGENTS.md for persona (Cursor has no equivalent setting).",
+      "",
+      "Agent teams (Claude Code only, opt-in): enable with `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`.",
+      "Used by the four party/meeting workflows. Installer does not set this env var.",
     ],
   },
 };
@@ -225,12 +264,16 @@ function renderOpenCodeGuide() {
   return renderBlock(docsData.opencode.title, docsData.opencode.lines);
 }
 
-function renderPiGuide() {
-  return renderBlock(docsData.pi.title, docsData.pi.lines);
+function renderPiSubagentGuide() {
+  return renderBlock(docsData.piSubagent.title, docsData.piSubagent.lines);
+}
+
+function renderMatrix() {
+  return renderBlock(docsData.matrix.title, docsData.matrix.lines);
 }
 
 function renderLearnMoreHint() {
-  return "Learn more: bmad-ml --about | --agents | --workflows | --opencode-guide | --pi-guide";
+  return "Learn more: bmad-ml --about | --agents | --workflows | --matrix | --opencode-guide | --pi-subagent-guide";
 }
 
 module.exports = {
@@ -240,6 +283,7 @@ module.exports = {
   renderAgents,
   renderWorkflows,
   renderOpenCodeGuide,
-  renderPiGuide,
+  renderPiSubagentGuide,
+  renderMatrix,
   renderLearnMoreHint,
 };

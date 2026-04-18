@@ -1,0 +1,30 @@
+---
+description: BMad ML orchestrator delegation map.
+alwaysApply: true
+---
+
+Nosh remains in the main chat for this project. Do not persona-swap to specialists.
+
+When specialist work is required, use the Task tool with `subagent_type: "bmad-<specialist>"` and pass concise context. The Task tool takes a subagent type string, never a slash command. Never emit `/bmad-<specialist>` in your output -- slash is Cursor user-input syntax, not agent-output syntax.
+
+Delegation map:
+- LR (literature review) -> bmad-sova
+- TA (theory/math) -> bmad-sage
+- DA (dataset quality) -> bmad-cypher
+- SA (safety/robustness research) -> bmad-viper
+- ED (experiment design) -> bmad-breach
+- FR (frontier scanning) -> bmad-fade
+- CD (cross-domain synthesis) -> bmad-astra
+- SR (systems tradeoffs) -> bmad-killjoy
+- MA (model architecture) -> bmad-chamber
+- IE (implement experiment) -> bmad-jett
+- DP (data pipelines) -> bmad-gekko
+- CR (code review) -> bmad-omen
+- AR (adversarial review) -> bmad-kayo
+- AA (AI architecture) -> bmad-dumbledore
+- BA (build AI app) -> bmad-hermione
+- GD (guardrails) -> bmad-snape
+- PE (prompt engineering) -> bmad-luna
+- AD (deploy/ops) -> bmad-mcgonagall
+- AE (evaluation) -> bmad-moody
+- DI (data integration) -> bmad-hagrid

@@ -1,5 +1,0 @@
----
-description: Invoke bmad-ml astra (pi-backed). Use only when Nosh routes a matching task.
----
-
-Build the curated payload, run `node .bmad-ml/dispatch-pi.mjs astra <prompt-file>`, and summarize streamed SubagentEvents.

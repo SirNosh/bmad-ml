@@ -7,7 +7,6 @@ const {
   installDirectory,
   installFile,
   mergeAgentsMd,
-  ensurePiSettings,
   mergeJsonPatch,
 } = require("../lib/install");
 const {
@@ -16,23 +15,77 @@ const {
   renderAgents,
   renderWorkflows,
   renderOpenCodeGuide,
-  renderPiGuide,
+  renderPiSubagentGuide,
+  renderMatrix,
   renderLearnMoreHint,
 } = require("../lib/docs");
 
-const IDE_FLAGS = ["--cursor", "--claude-code", "--opencode", "--pi", "--cc-pi", "--cursor-pi"];
+const ALIASES = {
+  "--opencode": "--oc",
+  "--cursor": "--cur",
+  "--claude-code": "--cc",
+  "--cursor-pi": "--cur-pi",
+  "--claude-code-pi": "--cc-pi",
+};
+
+const REMOVED_PI_MESSAGE = [
+  "--pi (standalone pi) has been removed in this release.",
+  "Use --cc-pi for Claude Code + pi subagents, or --cur-pi for Cursor + pi subagents.",
+].join("\n");
+
+const IDE_FLAGS = ["--oc", "--cur", "--cc", "--cur-pi", "--cc-pi"];
+const INSTALL_ONLY_FLAGS = [
+  "--force",
+  "--dry-run",
+  "--with-project-instructions",
+  "--no-project-instructions",
+  "--logging",
+  "--no-model-picker",
+];
+
 const KNOWN_FLAGS = new Set([
   ...IDE_FLAGS,
   ...DOC_FLAGS,
-  "--force",
-  "--dry-run",
+  ...INSTALL_ONLY_FLAGS,
   "--help",
   "-h",
 ]);
 
+function normalizeFlag(flag) {
+  return ALIASES[flag] || flag;
+}
+
 function printUsage() {
   console.log(
-    `Usage:\n  bmad-ml [--cursor|--claude-code|--opencode|--pi|--cc-pi|--cursor-pi] [--force] [--dry-run]\n  bmad-ml [--about|--agents|--workflows|--opencode-guide|--pi-guide]\n\nInstall options:\n  --cursor         Install skills to .cursor/skills/\n  --claude-code    Install skills to .claude/skills/\n  --opencode       Install skills to .opencode/skills/ and agent shims to .opencode/agents/\n  --pi             Install pi-native assets to .pi/\n  --cc-pi          Install Claude Code orchestrator + pi subagent runtime\n  --cursor-pi      Install Cursor orchestrator rules + pi subagent runtime\n  --force          Overwrite existing installed files/directories\n  --dry-run        Preview changes without writing files\n\nDocs options:\n  --about          What BMad ML is and how it is organized\n  --agents         Agent roster by division\n  --workflows      Workflow map by phase and outputs\n  --opencode-guide OpenCode-specific install/runtime behavior\n  --pi-guide       pi / hybrid install and runtime behavior\n\nOther:\n  --help           Show this help message`,
+    `Usage:
+  bmad-ml [--oc|--cur|--cc|--cur-pi|--cc-pi] [--force] [--dry-run]
+  bmad-ml [--about|--agents|--workflows|--matrix|--opencode-guide|--pi-subagent-guide]
+
+Install modes:
+  --oc          OpenCode mode (alias: --opencode)
+  --cur         Cursor subagent mode; Nosh persona via AGENTS.md, soft binding (alias: --cursor)
+  --cc          Claude Code subagent mode; Nosh as main-thread agent, hard binding (alias: --claude-code)
+  --cur-pi      Cursor + pi-backed specialists (alias: --cursor-pi)
+  --cc-pi       Claude Code + pi-backed specialists (alias: --claude-code-pi)
+
+Install options:
+  --force                     Overwrite existing installed files/directories
+  --dry-run                   Preview changes without writing files
+  --with-project-instructions Install AGENTS.md / CLAUDE.md bootstrap (default for --cur/--cc)
+  --no-project-instructions   Skip bootstrap install for --cur/--cc
+  --logging                   Install optional subagent logging hook scripts
+  --no-model-picker           Skip pi model picker during --cc-pi/--cur-pi install
+
+Docs options:
+  --about                What BMad ML is and how it is organized
+  --agents               Agent roster by division
+  --workflows            Workflow map by phase and outputs
+  --matrix               5-mode delivery matrix
+  --opencode-guide       OpenCode-specific install/runtime behavior
+  --pi-subagent-guide    pi hybrid subagent install/runtime behavior
+
+Other:
+  --help                 Show this help message`,
   );
 }
 
@@ -44,16 +97,22 @@ function parseArgs(argv) {
     throw new Error(`Unknown argument(s): ${positionalArgs.join(", ")}`);
   }
 
-  const unknownFlags = rawFlags.filter((flag) => !KNOWN_FLAGS.has(flag));
+  const normalizedFlags = rawFlags.map((flag) => normalizeFlag(flag));
+
+  if (normalizedFlags.includes("--pi")) {
+    throw new Error(REMOVED_PI_MESSAGE);
+  }
+
+  const unknownFlags = normalizedFlags.filter((flag) => !KNOWN_FLAGS.has(flag));
   if (unknownFlags.length > 0) {
     throw new Error(`Unknown flag(s): ${unknownFlags.join(", ")}`);
   }
 
-  const args = new Set(rawFlags);
+  const args = new Set(normalizedFlags);
   const hasHelp = args.has("--help") || args.has("-h");
 
   if (hasHelp) {
-    if (rawFlags.length > 1) {
+    if (normalizedFlags.length > 1) {
       throw new Error("--help cannot be combined with other flags");
     }
     return { mode: "help" };
@@ -75,17 +134,35 @@ function parseArgs(argv) {
   }
 
   if (selectedInstallFlags.length === 0 && selectedDocFlags.length === 0) {
-    if (args.has("--force") || args.has("--dry-run")) {
-      throw new Error("--force and --dry-run require an install target");
+    if (
+      args.has("--force") ||
+      args.has("--dry-run") ||
+      args.has("--with-project-instructions") ||
+      args.has("--no-project-instructions") ||
+      args.has("--logging") ||
+      args.has("--no-model-picker")
+    ) {
+      throw new Error("Install-only flags require an install target");
     }
     return { mode: "help" };
   }
 
   if (selectedDocFlags.length === 1) {
-    if (args.has("--force") || args.has("--dry-run")) {
-      throw new Error("--force and --dry-run are install-only flags");
+    if (
+      args.has("--force") ||
+      args.has("--dry-run") ||
+      args.has("--with-project-instructions") ||
+      args.has("--no-project-instructions") ||
+      args.has("--logging") ||
+      args.has("--no-model-picker")
+    ) {
+      throw new Error("Install-only flags cannot be combined with docs flags");
     }
     return { mode: "docs", docFlag: selectedDocFlags[0] };
+  }
+
+  if (args.has("--with-project-instructions") && args.has("--no-project-instructions")) {
+    throw new Error("Choose either --with-project-instructions or --no-project-instructions, not both");
   }
 
   return {
@@ -93,6 +170,9 @@ function parseArgs(argv) {
     ide: selectedInstallFlags[0].slice(2),
     force: args.has("--force"),
     dryRun: args.has("--dry-run"),
+    withProjectInstructions: !args.has("--no-project-instructions"),
+    withLogging: args.has("--logging"),
+    skipPicker: args.has("--no-model-picker"),
   };
 }
 
@@ -105,8 +185,10 @@ function printDocs(docFlag) {
     console.log(renderWorkflows());
   } else if (docFlag === "--opencode-guide") {
     console.log(renderOpenCodeGuide());
-  } else if (docFlag === "--pi-guide") {
-    console.log(renderPiGuide());
+  } else if (docFlag === "--pi-subagent-guide") {
+    console.log(renderPiSubagentGuide());
+  } else if (docFlag === "--matrix") {
+    console.log(renderMatrix());
   }
 
   console.log("");
@@ -115,82 +197,117 @@ function printDocs(docFlag) {
 
 function resolvePaths(ide) {
   const packageRoot = path.resolve(__dirname, "..");
+  const contentRoot = packageRoot;
   const projectRoot = process.cwd();
 
-  if (ide === "cursor") {
+  if (ide === "oc") {
     return {
-      skillsSource: path.join(packageRoot, "content", "bmad-ml-gen", "skills"),
-      skillsTarget: path.join(projectRoot, ".cursor", "skills"),
-    };
-  }
-
-  if (ide === "claude-code") {
-    return {
-      skillsSource: path.join(packageRoot, "content", "bmad-ml-gen", "skills"),
-      skillsTarget: path.join(projectRoot, ".claude", "skills"),
-    };
-  }
-
-  if (ide === "opencode") {
-    return {
-      skillsSource: path.join(packageRoot, "content", "bmad-ml-oc", "skills"),
+      skillsSource: path.join(contentRoot, "bmad-ml-oc", "skills"),
       skillsTarget: path.join(projectRoot, ".opencode", "skills"),
-      agentsSource: path.join(packageRoot, "content", "bmad-ml-oc", "agents", "opencode"),
+      agentsSource: path.join(contentRoot, "bmad-ml-oc", "agents", "opencode"),
       agentsTarget: path.join(projectRoot, ".opencode", "agents"),
     };
   }
 
-  if (ide === "pi") {
+  if (ide === "cur") {
     return {
-      skillsSource: path.join(packageRoot, "content", "bmad-ml-pi", "skills"),
+      skillsSource: path.join(contentRoot, "bmad-ml-gen", "skills"),
+      skillsTarget: path.join(projectRoot, ".cursor", "skills"),
+      agentsSource: path.join(contentRoot, "bmad-ml-gen", "cursor", "agents"),
+      agentsTarget: path.join(projectRoot, ".cursor", "agents"),
+      bootstrapSource: path.join(contentRoot, "bmad-ml-gen", "cursor", "bootstrap", "AGENTS.md"),
+      bootstrapTarget: path.join(projectRoot, "AGENTS.md"),
+      rulesSource: path.join(contentRoot, "bmad-ml-gen", "cursor", "rules"),
+      rulesTarget: path.join(projectRoot, ".cursor", "rules"),
+      hooksSource: path.join(contentRoot, "bmad-ml-gen", "cursor", "hooks"),
+      hooksTarget: path.join(projectRoot, ".cursor", "hooks"),
+      hooksManifestSource: path.join(contentRoot, "bmad-ml-gen", "cursor", "hooks.json"),
+      hooksManifestTarget: path.join(projectRoot, ".cursor", "hooks.json"),
+    };
+  }
+
+  if (ide === "cc") {
+    return {
+      skillsSource: path.join(contentRoot, "bmad-ml-gen", "skills"),
+      skillsTarget: path.join(projectRoot, ".claude", "skills"),
+      agentsSource: path.join(contentRoot, "bmad-ml-gen", "claude-code", "agents"),
+      agentsTarget: path.join(projectRoot, ".claude", "agents"),
+      bootstrapSource: path.join(contentRoot, "bmad-ml-gen", "claude-code", "bootstrap", "CLAUDE.md"),
+      bootstrapTarget: path.join(projectRoot, "CLAUDE.md"),
+      rulesSource: path.join(contentRoot, "bmad-ml-gen", "claude-code", "rules"),
+      rulesTarget: path.join(projectRoot, ".claude", "rules"),
+      settingsPatch: path.join(contentRoot, "bmad-ml-gen", "claude-code", "settings-patch.json"),
+      settingsTarget: path.join(projectRoot, ".claude", "settings.json"),
+      hooksSource: path.join(contentRoot, "bmad-ml-gen", "claude-code", "hooks"),
+      hooksTarget: path.join(projectRoot, ".claude", "hooks"),
+      delegationSource: path.join(
+        contentRoot,
+        "bmad-ml-gen",
+        "skills",
+        "bmad-ml-nosh",
+        "DELEGATION.md",
+      ),
+      delegationTarget: path.join(projectRoot, ".claude", "skills", "bmad-ml-nosh", "DELEGATION.md"),
+    };
+  }
+
+  if (ide === "cur-pi") {
+    return {
+      skillsSource: path.join(contentRoot, "bmad-ml-pi", "skills"),
       skillsTarget: path.join(projectRoot, ".pi", "skills"),
-      promptsSource: path.join(packageRoot, "content", "bmad-ml-pi", "prompts"),
-      promptsTarget: path.join(projectRoot, ".pi", "prompts"),
-      extensionSource: path.join(packageRoot, "content", "bmad-ml-pi", "extension", "dist"),
-      extensionTarget: path.join(projectRoot, ".pi", "extensions", "bmad-ml"),
-      agentsMdSource: path.join(packageRoot, "content", "bmad-ml-pi", "AGENTS.md"),
-      agentsMdTarget: path.join(projectRoot, ".pi", "AGENTS.md"),
-      agentsSource: path.join(packageRoot, "content", "bmad-ml-pi", "agents", "pi"),
-      agentsTarget: path.join(projectRoot, ".pi", "agents", "bmad-ml"),
-      systemSource: path.join(packageRoot, "content", "bmad-ml-pi", "SYSTEM.md"),
-      systemTarget: path.join(projectRoot, ".pi", "APPEND_SYSTEM.md"),
-      piSettingsTarget: path.join(projectRoot, ".pi", "settings.json"),
+      dispatcherSource: path.join(contentRoot, "bmad-ml-pi", "hybrid", "dispatch-pi.mjs"),
+      dispatcherTarget: path.join(projectRoot, ".bmad-ml", "dispatch-pi.mjs"),
+      dispatcherShSource: path.join(contentRoot, "bmad-ml-pi", "hybrid", "dispatch-pi.sh"),
+      dispatcherShTarget: path.join(projectRoot, ".bmad-ml", "dispatch-pi.sh"),
+      cursorSkillsSource: path.join(contentRoot, "bmad-ml-pi", "hybrid", "cursor", "skills"),
+      cursorSkillsTarget: path.join(projectRoot, ".cursor", "skills"),
+      cursorAgentsSource: path.join(contentRoot, "bmad-ml-pi", "hybrid", "cursor", "agents"),
+      cursorAgentsTarget: path.join(projectRoot, ".cursor", "agents"),
+      cursorBootstrapSource: path.join(contentRoot, "bmad-ml-pi", "hybrid", "cursor", "bootstrap", "AGENTS.md"),
+      cursorBootstrapTarget: path.join(projectRoot, "AGENTS.md"),
+      cursorRulesSource: path.join(contentRoot, "bmad-ml-pi", "hybrid", "cursor", "rules"),
+      cursorRulesTarget: path.join(projectRoot, ".cursor", "rules"),
+      cursorHooksManifestSource: path.join(contentRoot, "bmad-ml-pi", "hybrid", "cursor", "hooks.json"),
+      cursorHooksManifestTarget: path.join(projectRoot, ".cursor", "hooks.json"),
+      cursorHooksSource: path.join(contentRoot, "bmad-ml-pi", "hybrid", "cursor", "hooks"),
+      cursorHooksTarget: path.join(projectRoot, ".cursor", "hooks"),
     };
   }
 
   if (ide === "cc-pi") {
     return {
-      skillsSource: path.join(packageRoot, "content", "bmad-ml-pi", "skills"),
+      skillsSource: path.join(contentRoot, "bmad-ml-pi", "skills"),
       skillsTarget: path.join(projectRoot, ".pi", "skills"),
-      subagentExtensionSource: path.join(packageRoot, "content", "bmad-ml-pi", "subagent-extension", "dist"),
-      subagentExtensionTarget: path.join(projectRoot, ".pi", "extensions", "bmad-ml-subagent"),
-      dispatcherSource: path.join(packageRoot, "content", "bmad-ml-pi", "hybrid", "dispatch-pi.mjs"),
+      dispatcherSource: path.join(contentRoot, "bmad-ml-pi", "hybrid", "dispatch-pi.mjs"),
       dispatcherTarget: path.join(projectRoot, ".bmad-ml", "dispatch-pi.mjs"),
-      dispatcherShSource: path.join(packageRoot, "content", "bmad-ml-pi", "hybrid", "dispatch-pi.sh"),
+      dispatcherShSource: path.join(contentRoot, "bmad-ml-pi", "hybrid", "dispatch-pi.sh"),
       dispatcherShTarget: path.join(projectRoot, ".bmad-ml", "dispatch-pi.sh"),
-      ccSkillsSource: path.join(packageRoot, "content", "bmad-ml-pi", "hybrid", "cc", "skills"),
-      ccSkillsTarget: path.join(projectRoot, ".claude", "skills"),
-      ccAgentsSource: path.join(packageRoot, "content", "bmad-ml-pi", "hybrid", "cc", "agents"),
-      ccAgentsTarget: path.join(projectRoot, ".claude", "agents"),
-      ccSettingsPatch: path.join(packageRoot, "content", "bmad-ml-pi", "hybrid", "cc", "settings-patch.json"),
-      ccSettingsTarget: path.join(projectRoot, ".claude", "settings.json"),
-      piSettingsTarget: path.join(projectRoot, ".pi", "settings.json"),
+      claudeSkillsSource: path.join(contentRoot, "bmad-ml-pi", "hybrid", "claude-code", "skills"),
+      claudeSkillsTarget: path.join(projectRoot, ".claude", "skills"),
+      claudeAgentsSource: path.join(contentRoot, "bmad-ml-pi", "hybrid", "claude-code", "agents"),
+      claudeAgentsTarget: path.join(projectRoot, ".claude", "agents"),
+      claudeBootstrapSource: path.join(contentRoot, "bmad-ml-pi", "hybrid", "claude-code", "bootstrap", "CLAUDE.md"),
+      claudeBootstrapTarget: path.join(projectRoot, "CLAUDE.md"),
+      claudeRulesSource: path.join(contentRoot, "bmad-ml-pi", "hybrid", "claude-code", "rules"),
+      claudeRulesTarget: path.join(projectRoot, ".claude", "rules"),
+      claudeSettingsPatch: path.join(contentRoot, "bmad-ml-pi", "hybrid", "claude-code", "settings-patch.json"),
+      claudeSettingsTarget: path.join(projectRoot, ".claude", "settings.json"),
+      claudeHooksSource: path.join(contentRoot, "bmad-ml-pi", "hybrid", "claude-code", "hooks"),
+      claudeHooksTarget: path.join(projectRoot, ".claude", "hooks"),
+      delegationSource: path.join(
+        contentRoot,
+        "bmad-ml-pi",
+        "hybrid",
+        "claude-code",
+        "skills",
+        "bmad-ml-nosh",
+        "DELEGATION.md",
+      ),
+      delegationTarget: path.join(projectRoot, ".claude", "skills", "bmad-ml-nosh", "DELEGATION.md"),
     };
   }
 
-  return {
-    skillsSource: path.join(packageRoot, "content", "bmad-ml-pi", "skills"),
-    skillsTarget: path.join(projectRoot, ".pi", "skills"),
-    subagentExtensionSource: path.join(packageRoot, "content", "bmad-ml-pi", "subagent-extension", "dist"),
-    subagentExtensionTarget: path.join(projectRoot, ".pi", "extensions", "bmad-ml-subagent"),
-    dispatcherSource: path.join(packageRoot, "content", "bmad-ml-pi", "hybrid", "dispatch-pi.mjs"),
-    dispatcherTarget: path.join(projectRoot, ".bmad-ml", "dispatch-pi.mjs"),
-    dispatcherShSource: path.join(packageRoot, "content", "bmad-ml-pi", "hybrid", "dispatch-pi.sh"),
-    dispatcherShTarget: path.join(projectRoot, ".bmad-ml", "dispatch-pi.sh"),
-    cursorRulesSource: path.join(packageRoot, "content", "bmad-ml-pi", "hybrid", "cursor", "rules"),
-    cursorRulesTarget: path.join(projectRoot, ".cursor", "rules"),
-    piSettingsTarget: path.join(projectRoot, ".pi", "settings.json"),
-  };
+  throw new Error(`Unknown install mode: ${ide}`);
 }
 
 function formatDryRunTag(dryRun) {
@@ -203,7 +320,8 @@ function printSummary(label, result, dryRun) {
   console.log(`${prefix}${label}: ${result.installedCount} installed, ${result.skippedCount} skipped -> ${target}`);
 }
 
-function printNextSteps({ ide, paths, dryRun }) {
+
+function printNextSteps({ ide, paths, dryRun, withProjectInstructions, withLogging }) {
   console.log("");
   if (dryRun) {
     console.log("[dry-run] Preview complete. No files were written.");
@@ -214,44 +332,59 @@ function printNextSteps({ ide, paths, dryRun }) {
 
   console.log("1. Run `ml-setup` in your IDE to configure _bmad/config.yaml and _bmad/config.user.yaml.");
 
-  if (ide === "cursor") {
-    console.log("2. In Cursor, say: \"use bmad-ml-nosh\".");
-  } else if (ide === "claude-code") {
-    console.log("2. In Claude Code, say: \"load bmad-ml-nosh\".");
-  } else if (ide === "opencode") {
+  if (ide === "oc") {
     console.log("2. Start OpenCode in this project and press Tab to switch to Nosh.");
-    console.log("3. OpenCode mode supports parallel subagent delegation via Task tool.");
-  } else if (ide === "pi") {
-    console.log("2. Start pi in this project: `pi`.");
-    console.log("3. Nosh boots from `.pi/AGENTS.md` and delegates using `bmad_task`.");
-    console.log("4. Use `.pi/prompts/PI-MODELS.md` to review model bindings.");
+    console.log("3. Delegate independent specialist tasks in parallel with the Task tool.");
+  } else if (ide === "cur") {
+    if (withProjectInstructions) {
+      console.log("2. Open Cursor; AGENTS.md and .cursor/rules bootstrap Nosh as the main-chat persona.");
+    } else {
+      console.log("2. Open Cursor and invoke `bmad-ml-nosh` manually (project bootstrap was skipped).");
+    }
+    console.log("3. Delegate specialists via the Task tool with `subagent_type: \"bmad-<specialist>\"`.");
+  } else if (ide === "cc") {
+    console.log("2. Open Claude Code; `.claude/settings.json` binds Nosh as the session-default agent (see `@bmad-ml-nosh` in the startup header).");
+    console.log("3. Delegate specialists via the Agent tool (aliased from Task) with `subagent_type: \"bmad-<specialist>\"`.");
+    console.log("   Opt out of hard binding by removing the `\"agent\"` key from .claude/settings.json.");
+  } else if (ide === "cur-pi") {
+    console.log("2. Open Cursor; Nosh runs in main chat from AGENTS.md + .cursor/rules.");
+    console.log("3. Delegate specialists via Cursor subagent shims that run `.bmad-ml/dispatch-pi.mjs`.");
   } else if (ide === "cc-pi") {
-    console.log("2. Open Claude Code and load `bmad-ml-nosh` from `.claude/skills/`.");
-    console.log("3. Nosh delegates specialists via Task shims that call `.bmad-ml/dispatch-pi.mjs`.");
-  } else {
-    console.log("2. Open Cursor Agent Mode.");
-    console.log("3. `.cursor/rules/bmad-ml-nosh.mdc` orchestrates pi-backed specialist dispatch.");
-    console.log("4. Parallel specialist work degrades to sequential in Cursor hybrid mode.");
+    console.log("2. Open Claude Code; Nosh runs in main chat from CLAUDE.md + .claude/rules.");
+    console.log("3. Delegate specialists via Claude subagent shims that run `.bmad-ml/dispatch-pi.mjs`.");
   }
 
   console.log(`Skills location: ${paths.skillsTarget}`);
+
   if (paths.agentsTarget) {
     console.log(`Agent location: ${paths.agentsTarget}`);
   }
-  if (paths.promptsTarget) {
-    console.log(`Prompt templates: ${paths.promptsTarget}`);
+  if (paths.cursorAgentsTarget) {
+    console.log(`Cursor shim location: ${paths.cursorAgentsTarget}`);
   }
-  if (paths.extensionTarget) {
-    console.log(`Extension location: ${paths.extensionTarget}`);
+  if (paths.claudeAgentsTarget) {
+    console.log(`Claude shim location: ${paths.claudeAgentsTarget}`);
   }
   if (paths.dispatcherTarget) {
     console.log(`Dispatcher script: ${paths.dispatcherTarget}`);
   }
 
+  if (withLogging) {
+    if (paths.hooksTarget) {
+      console.log(`Hooks location: ${paths.hooksTarget}`);
+    }
+    if (paths.cursorHooksTarget) {
+      console.log(`Cursor hooks location: ${paths.cursorHooksTarget}`);
+    }
+    if (paths.claudeHooksTarget) {
+      console.log(`Claude hooks location: ${paths.claudeHooksTarget}`);
+    }
+  }
+
   console.log(renderLearnMoreHint());
 }
 
-function main() {
+async function main() {
   let parsed;
   try {
     parsed = parseArgs(process.argv.slice(2));
@@ -271,7 +404,7 @@ function main() {
     return;
   }
 
-  const { ide, force, dryRun } = parsed;
+  const { ide, force, dryRun, withProjectInstructions, withLogging, skipPicker } = parsed;
   const paths = resolvePaths(ide);
 
   try {
@@ -283,75 +416,77 @@ function main() {
     });
     printSummary("Skills", skillResult, dryRun);
 
-    if (ide === "opencode") {
-      const agentResult = installAgents({
+    if (ide === "oc") {
+      printSummary("Agents", installAgents({
         sourceRoot: paths.agentsSource,
         targetRoot: paths.agentsTarget,
         force,
         dryRun,
-      });
-      printSummary("Agents", agentResult, dryRun);
+      }), dryRun);
     }
 
-    if (ide === "pi") {
-      printSummary("Prompts", installDirectory({
-        sourceRoot: paths.promptsSource,
-        targetRoot: paths.promptsTarget,
-        force,
-        dryRun,
-      }), dryRun);
-
-      printSummary("Extension", installDirectory({
-        sourceRoot: paths.extensionSource,
-        targetRoot: paths.extensionTarget,
-        force,
-        dryRun,
-      }), dryRun);
-
-      printSummary("Agent refs", installDirectory({
+    if (ide === "cur" || ide === "cc") {
+      printSummary("Specialist agents", installAgents({
         sourceRoot: paths.agentsSource,
         targetRoot: paths.agentsTarget,
         force,
         dryRun,
       }), dryRun);
 
-      printSummary("AGENTS bootstrap", mergeAgentsMd({
-        sourceFile: paths.agentsMdSource,
-        targetFile: paths.agentsMdTarget,
-        force,
-        dryRun,
-      }), dryRun);
+      if (withProjectInstructions) {
+        printSummary("Project bootstrap", mergeAgentsMd({
+          sourceFile: paths.bootstrapSource,
+          targetFile: paths.bootstrapTarget,
+          force,
+          dryRun,
+        }), dryRun);
 
-      printSummary("System append", installFile({
-        sourceFile: paths.systemSource,
-        targetFile: paths.systemTarget,
-        force,
-        dryRun,
-      }), dryRun);
+        printSummary("Rules", installDirectory({
+          sourceRoot: paths.rulesSource,
+          targetRoot: paths.rulesTarget,
+          force,
+          dryRun,
+        }), dryRun);
+      } else {
+        console.log(`${formatDryRunTag(dryRun)}Project bootstrap skipped (--no-project-instructions).`);
+      }
 
-      printSummary("pi settings", ensurePiSettings({
-        settingsPath: paths.piSettingsTarget,
-        extensionName: "bmad-ml",
-        force,
-        dryRun,
-      }), dryRun);
+      if (ide === "cc") {
+        printSummary("Settings", mergeJsonPatch({
+          patchFile: paths.settingsPatch,
+          targetFile: paths.settingsTarget,
+          force,
+          dryRun,
+        }), dryRun);
+
+        printSummary("Nosh delegation overlay", installFile({
+          sourceFile: paths.delegationSource,
+          targetFile: paths.delegationTarget,
+          force,
+          dryRun,
+        }), dryRun);
+      }
+
+      if (withLogging) {
+        printSummary("Hooks", installDirectory({
+          sourceRoot: paths.hooksSource,
+          targetRoot: paths.hooksTarget,
+          force,
+          dryRun,
+        }), dryRun);
+
+        if (ide === "cur") {
+          printSummary("Hooks manifest", installFile({
+            sourceFile: paths.hooksManifestSource,
+            targetFile: paths.hooksManifestTarget,
+            force,
+            dryRun,
+          }), dryRun);
+        }
+      }
     }
 
-    if (ide === "cc-pi" || ide === "cursor-pi") {
-      printSummary("Subagent extension", installDirectory({
-        sourceRoot: paths.subagentExtensionSource,
-        targetRoot: paths.subagentExtensionTarget,
-        force,
-        dryRun,
-      }), dryRun);
-
-      printSummary("pi settings", ensurePiSettings({
-        settingsPath: paths.piSettingsTarget,
-        extensionName: "bmad-ml-subagent",
-        force,
-        dryRun,
-      }), dryRun);
-
+    if (ide === "cur-pi" || ide === "cc-pi") {
       printSummary("Dispatcher", installFile({
         sourceFile: paths.dispatcherSource,
         targetFile: paths.dispatcherTarget,
@@ -365,45 +500,127 @@ function main() {
         force,
         dryRun,
       }), dryRun);
+
+      if (ide === "cur-pi") {
+        printSummary("Cursor skills", installDirectory({
+          sourceRoot: paths.cursorSkillsSource,
+          targetRoot: paths.cursorSkillsTarget,
+          force,
+          dryRun,
+        }), dryRun);
+
+        printSummary("Cursor shims", installAgents({
+          sourceRoot: paths.cursorAgentsSource,
+          targetRoot: paths.cursorAgentsTarget,
+          force,
+          dryRun,
+        }), dryRun);
+
+        printSummary("Project bootstrap", mergeAgentsMd({
+          sourceFile: paths.cursorBootstrapSource,
+          targetFile: paths.cursorBootstrapTarget,
+          force,
+          dryRun,
+        }), dryRun);
+
+        printSummary("Cursor rules", installDirectory({
+          sourceRoot: paths.cursorRulesSource,
+          targetRoot: paths.cursorRulesTarget,
+          force,
+          dryRun,
+        }), dryRun);
+
+        if (withLogging) {
+          printSummary("Cursor hooks", installDirectory({
+            sourceRoot: paths.cursorHooksSource,
+            targetRoot: paths.cursorHooksTarget,
+            force,
+            dryRun,
+          }), dryRun);
+
+          printSummary("Cursor hooks manifest", installFile({
+            sourceFile: paths.cursorHooksManifestSource,
+            targetFile: paths.cursorHooksManifestTarget,
+            force,
+            dryRun,
+          }), dryRun);
+        }
+      }
+
+      if (ide === "cc-pi") {
+        printSummary("Claude skills", installDirectory({
+          sourceRoot: paths.claudeSkillsSource,
+          targetRoot: paths.claudeSkillsTarget,
+          force,
+          dryRun,
+        }), dryRun);
+
+        printSummary("Claude shims", installAgents({
+          sourceRoot: paths.claudeAgentsSource,
+          targetRoot: paths.claudeAgentsTarget,
+          force,
+          dryRun,
+        }), dryRun);
+
+        printSummary("Project bootstrap", mergeAgentsMd({
+          sourceFile: paths.claudeBootstrapSource,
+          targetFile: paths.claudeBootstrapTarget,
+          force,
+          dryRun,
+        }), dryRun);
+
+        printSummary("Claude rules", installDirectory({
+          sourceRoot: paths.claudeRulesSource,
+          targetRoot: paths.claudeRulesTarget,
+          force,
+          dryRun,
+        }), dryRun);
+
+        printSummary("Nosh delegation overlay", installFile({
+          sourceFile: paths.delegationSource,
+          targetFile: paths.delegationTarget,
+          force,
+          dryRun,
+        }), dryRun);
+
+        printSummary("Claude settings", mergeJsonPatch({
+          patchFile: paths.claudeSettingsPatch,
+          targetFile: paths.claudeSettingsTarget,
+          force,
+          dryRun,
+        }), dryRun);
+
+        if (withLogging) {
+          printSummary("Claude hooks", installDirectory({
+            sourceRoot: paths.claudeHooksSource,
+            targetRoot: paths.claudeHooksTarget,
+            force,
+            dryRun,
+          }), dryRun);
+        }
+      }
+
+      const { runModelPicker } = require("../lib/pi-model-picker");
+      await runModelPicker({
+        settingsFile: path.join(process.cwd(), ".pi", "settings.json"),
+        dryRun,
+        force,
+        skipPicker,
+        stdin: process.stdin,
+        stdout: process.stdout,
+        stderr: process.stderr,
+        env: process.env,
+      });
     }
 
-    if (ide === "cc-pi") {
-      printSummary("Claude skills", installDirectory({
-        sourceRoot: paths.ccSkillsSource,
-        targetRoot: paths.ccSkillsTarget,
-        force,
-        dryRun,
-      }), dryRun);
-
-      printSummary("Claude agents", installDirectory({
-        sourceRoot: paths.ccAgentsSource,
-        targetRoot: paths.ccAgentsTarget,
-        force,
-        dryRun,
-      }), dryRun);
-
-      printSummary("Claude settings", mergeJsonPatch({
-        patchFile: paths.ccSettingsPatch,
-        targetFile: paths.ccSettingsTarget,
-        force,
-        dryRun,
-      }), dryRun);
-    }
-
-    if (ide === "cursor-pi") {
-      printSummary("Cursor rules", installDirectory({
-        sourceRoot: paths.cursorRulesSource,
-        targetRoot: paths.cursorRulesTarget,
-        force,
-        dryRun,
-      }), dryRun);
-    }
-
-    printNextSteps({ ide, paths, dryRun });
+    printNextSteps({ ide, paths, dryRun, withProjectInstructions, withLogging });
   } catch (error) {
     console.error(`Error: ${error.message}`);
     process.exit(2);
   }
 }
 
-main();
+main().catch((error) => {
+  console.error(`Error: ${error.message}`);
+  process.exit(2);
+});

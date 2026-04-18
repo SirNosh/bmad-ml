@@ -1,5 +1,0 @@
----
-description: Invoke bmad-ml sova (pi-backed). Use only when Nosh routes a matching task.
----
-
-Build the curated payload, run `node .bmad-ml/dispatch-pi.mjs sova <prompt-file>`, and summarize streamed SubagentEvents.
